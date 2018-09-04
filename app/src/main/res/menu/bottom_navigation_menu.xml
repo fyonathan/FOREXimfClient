@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/action_signal"
+        android:title="@string/menu_signal"
+        android:icon="@mipmap/ic_markets" />
+    <item android:id="@+id/action_assistant"
+        android:title="@string/menu_assistant"
+        android:icon="@mipmap/ic_assistant" />
+    <item android:id="@+id/action_chat"
+        android:title="@string/menu_chat"
+        android:icon="@mipmap/ic_chat" />
+</menu>

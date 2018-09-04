@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "932220569686",
+    "firebase_url": "https://foreximfclient.firebaseio.com",
+    "project_id": "foreximfclient",
+    "storage_bucket": "foreximfclient.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:932220569686:android:26286718dd451000",
+        "android_client_info": {
+          "package_name": "com.foreximf.client"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "932220569686-godpoq8ud91bvus5s40ug3h7dkhdsvdg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.foreximf.client",
+            "certificate_hash": "29e58ee54c3f4bf0a11b50e44d4f581fc60fef79"
+          }
+        },
+        {
+          "client_id": "932220569686-1gmefrpr9c9661t55avbq5k183edllvm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDhCkGRlBFs62Zq9cnMD579nlwL9MevO1w"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "932220569686-1gmefrpr9c9661t55avbq5k183edllvm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
