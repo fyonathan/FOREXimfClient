@@ -46,6 +46,7 @@ import com.foreximf.client.news.NewsViewModel;
 import com.foreximf.client.signal.Signal;
 import com.foreximf.client.signal.SignalFragment;
 import com.foreximf.client.signal.SignalViewModel;
+import com.foreximf.client.util.DateFormatter;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
@@ -97,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements SignalFragment.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        FirebaseMessaging.getInstance().subscribeToTopic("signal4");
+        FirebaseMessaging.getInstance().subscribeToTopic("signal99");
         FirebaseMessaging.getInstance().subscribeToTopic("news");
 
         //final ForexImfAppDatabase appDatabase = ForexImfAppDatabase.getDatabase(this.getApplication());
@@ -143,10 +144,11 @@ public class MainActivity extends AppCompatActivity implements SignalFragment.On
         ft.replace(R.id.fragment_container, currentFragment, "SIGNAL");
         ft.commit();
 
-        toolbar = findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.toolbar_main);
         setSupportActionBar(toolbar);
 
         drawer = findViewById(R.id.drawer);
+        drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 
         slidingUpPanelLayout = findViewById(R.id.sliding_layout);
 
@@ -160,8 +162,8 @@ public class MainActivity extends AppCompatActivity implements SignalFragment.On
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
-        bottomNavigationView = findViewById(R.id.navigation_view);
-        bottomNavigationView.setOnNavigationItemSelectedListener(bottomNavListener);
+//        bottomNavigationView = findViewById(R.id.navigation_view);
+//        bottomNavigationView.setOnNavigationItemSelectedListener(bottomNavListener);
 
         dailyListView = findViewById(R.id.daily_list_view);
         dailyAdapter = new NewsRecyclerViewAdapter(this);
@@ -195,36 +197,17 @@ public class MainActivity extends AppCompatActivity implements SignalFragment.On
         boolean firstVisit = preferences.getBoolean("first-visit", true);
         if(firstVisit) {
             RequestQueue queue = Volley.newRequestQueue(this);
-
             JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, URL, null, new Response.Listener<JSONObject>() {
 
                 @Override
                 public void onResponse(JSONObject response) {
                     try {
                         JSONArray result = response.getJSONArray("result");
-//                        Log.d("Main Activity", "Result : " + result);
                         JSONObject signal = result.getJSONObject(0);
                         JSONObject news = result.getJSONObject(1);
                         JSONObject analysis = result.getJSONObject(2);
-//                        Log.d("Main Activity", "Type signal : " + signal.getString("type"));
-//                        Log.d("Main Activity", "Type news : " + signal.getString("type"));
-                        String dateArray = signal.getString("updated_at");
-                        String dateString = "";
-                        try {
-                            dateString = new JSONObject(dateArray).getString("date");
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-//                        String newDateString = "";
-                        Date date = new Date(System.currentTimeMillis());
-                        try {
-                            date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH).parse(dateString);
-                            SimpleDateFormat sdfOutput = new SimpleDateFormat("dd MMM, HH:mm", Locale.ENGLISH);
-                            sdfOutput.setTimeZone(TimeZone.getTimeZone("Asia/Jakarta"));
-//                            newDateString = sdfOutput.format(date);
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
+                        String dateString = signal.getString("updated_at");
+                        Date date = DateFormatter.format(dateString);
 
                         News signalItem = new News(News.typeConverter(signal.getInt("type")), signal.getString("title"), signal.getString("content"), signal.getString("author"), date);
                         News newsItem = new News(News.typeConverter(news.getInt("type")), news.getString("title"), news.getString("content"), news.getString("author"), date);
@@ -237,13 +220,7 @@ public class MainActivity extends AppCompatActivity implements SignalFragment.On
                         e.printStackTrace();
                     }
                 }
-            }, new Response.ErrorListener() {
-
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Log.e("Error response", "Error gan!");
-                }
-            });
+            }, error -> Log.e("Error response", "Error gan!"));
 
             queue.add(request);
             preferences.edit().putBoolean("first-visit", false).apply();
@@ -320,18 +297,18 @@ public class MainActivity extends AppCompatActivity implements SignalFragment.On
     };
 
     private void changeBadgeStatus(int unreadCount) {
-        BottomNavigationMenuView bottomNavigationMenuView =
-                (BottomNavigationMenuView) bottomNavigationView.getChildAt(0);
-        View v = bottomNavigationMenuView.getChildAt(0);
-        if(unreadCount > 0) {
-            badge = new QBadgeView(getApplicationContext()).bindTarget(v).setBadgeNumber(unreadCount).setBadgeGravity(Gravity.END | Gravity.TOP).setGravityOffset(35, 0, true);
-        }else{
-            try {
-                badge.hide(false);
-            } catch (Exception e) {
-                Log.e("Badge status", "Badge is null");
-            }
-        }
+//        BottomNavigationMenuView bottomNavigationMenuView =
+//                (BottomNavigationMenuView) bottomNavigationView.getChildAt(0);
+//        View v = bottomNavigationMenuView.getChildAt(0);
+//        if(unreadCount > 0) {
+//            badge = new QBadgeView(getApplicationContext()).bindTarget(v).setBadgeNumber(unreadCount).setBadgeGravity(Gravity.END | Gravity.TOP).setGravityOffset(35, 0, true);
+//        }else{
+//            try {
+//                badge.hide(false);
+//            } catch (Exception e) {
+//                Log.e("Badge status", "Badge is null");
+//            }
+//        }
     }
 
     @Override
@@ -349,10 +326,10 @@ public class MainActivity extends AppCompatActivity implements SignalFragment.On
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_favorite) {
-            Toast.makeText(MainActivity.this, "Action clicked", Toast.LENGTH_LONG).show();
-            return true;
-        }
+//        if (id == R.id.action_favorite) {
+//            Toast.makeText(MainActivity.this, "Action clicked", Toast.LENGTH_LONG).show();
+//            return true;
+//        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -360,5 +337,32 @@ public class MainActivity extends AppCompatActivity implements SignalFragment.On
     @Override
     public void onFragmentInteraction(int unreadCount) {
         changeBadgeStatus(unreadCount);
+    }
+
+    public void getClientStatus() {
+        RequestQueue queue = Volley.newRequestQueue(this);
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, URL, null, response -> {
+            try {
+                response.getJSONArray("lead_status");
+                JSONArray result = response.getJSONArray("result");
+                JSONObject signal = result.getJSONObject(0);
+                JSONObject news = result.getJSONObject(1);
+                JSONObject analysis = result.getJSONObject(2);
+                String dateString = signal.getString("updated_at");
+                Date date = DateFormatter.format(dateString);
+
+                News signalItem = new News(News.typeConverter(signal.getInt("type")), signal.getString("title"), signal.getString("content"), signal.getString("author"), date);
+                News newsItem = new News(News.typeConverter(news.getInt("type")), news.getString("title"), news.getString("content"), news.getString("author"), date);
+                News analysisItem = new News(News.typeConverter(analysis.getInt("type")), analysis.getString("title"), analysis.getString("content"), analysis.getString("author"), date);
+//                        NewsRepository newsRepository = new NewsRepository(getApplication());
+                newsViewModel.addNews(signalItem);
+                newsViewModel.addNews(newsItem);
+                newsViewModel.addNews(analysisItem);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }, error -> Log.e("Error response", "Error gan!"));
+
+        queue.add(request);
     }
 }

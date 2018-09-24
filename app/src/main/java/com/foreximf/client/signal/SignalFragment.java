@@ -2,10 +2,9 @@ package com.foreximf.client.signal;
 
 import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModel;
-import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
@@ -16,8 +15,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,10 +25,7 @@ import android.widget.Spinner;
 import com.foreximf.client.R;
 
 
-import java.util.ArrayList;
 import java.util.List;
-
-import q.rorbin.badgeview.Badge;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -41,7 +35,7 @@ import q.rorbin.badgeview.Badge;
  * Use the {@link SignalFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class SignalFragment extends Fragment {
+public class SignalFragment extends Fragment implements SignalViewHolder.ViewHolderListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -59,6 +53,10 @@ public class SignalFragment extends Fragment {
     private SignalViewModel viewModel;
 
     private OnFragmentInteractionListener mListener;
+
+    private Spinner statusSpinner, currencySpinner, groupSpinner;
+    private SignalViewHolder.ViewHolderListener listener;
+    private Observer<List<Signal>> signalObserver;
 
     public SignalFragment() {
         // Required empty public constructor
@@ -85,6 +83,7 @@ public class SignalFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        listener = this;
 //        Log.d("Signal Fragment", "UPILLLL");
     }
 
@@ -107,9 +106,7 @@ public class SignalFragment extends Fragment {
         //News news = new News("Breaking News", "Yen Menguat", "Test Content");
 //        ArrayList<Signal> _signalList = new ArrayList<>();
 //        newsList.add(news);
-        signalAdapter = new SignalRecyclerViewAdapter(getActivity(), getLayoutInflater());
-//        signalAdapter.setHasStableIds(true);
-//        signalAdapter.setOnBottomReachedListener(bottomReachedListener);
+        signalAdapter = new SignalRecyclerViewAdapter(getLayoutInflater(), this);
 
         signalListView.setAdapter(signalAdapter);
         signalListView.addOnScrollListener(scrollListener);
@@ -117,15 +114,41 @@ public class SignalFragment extends Fragment {
 
         viewModel = ViewModelProviders.of(this).get(SignalViewModel.class);
 
-        final Observer<List<Signal>> signalObserver = new Observer<List<Signal>>() {
+        signalObserver = signalList -> signalAdapter.setSignal(signalList);
 
-            @Override
-            public void onChanged(@Nullable List<Signal> signalList) {
-                signalAdapter.setSignal(signalList);
-            }
-        };
+        viewModel.getAllSignal().observe(this, signalObserver);
 
-        viewModel.getSignalByCount(10).observe(this, signalObserver);
+        SharedPreferences preferences = getActivity().getSharedPreferences("spinner-select", Context.MODE_PRIVATE);
+
+        statusSpinner = view.findViewById(R.id.signal_status_spinner);
+        ArrayAdapter<CharSequence> sAdapter = ArrayAdapter.createFromResource(view.getContext(),
+                R.array.spinner_status_list_item_array, android.R.layout.simple_spinner_item);
+        // Specify the layout to use when the list of choices appears
+        sAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        statusSpinner.setAdapter(sAdapter);
+        statusSpinner.setOnItemSelectedListener(statusSelected);
+        statusSpinner.setSelection(preferences.getInt("status-selected", 0));
+
+        currencySpinner = view.findViewById(R.id.signal_currency_spinner);
+        ArrayAdapter<CharSequence> cAdapter = ArrayAdapter.createFromResource(view.getContext(),
+                R.array.spinner_currency_list_item_array, android.R.layout.simple_spinner_item);
+        // Specify the layout to use when the list of choices appears
+        cAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        currencySpinner.setAdapter(cAdapter);
+        currencySpinner.setOnItemSelectedListener(pairSelected);
+        currencySpinner.setSelection(preferences.getInt("pair-selected", 0));
+
+        groupSpinner = view.findViewById(R.id.signal_group_spinner);
+        ArrayAdapter<CharSequence> gAdapter = ArrayAdapter.createFromResource(view.getContext(),
+                R.array.spinner_group_list_item_array, android.R.layout.simple_spinner_item);
+        // Specify the layout to use when the list of choices appears
+        gAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        groupSpinner.setAdapter(gAdapter);
+        groupSpinner.setOnItemSelectedListener(groupSelected);
+        groupSpinner.setSelection(preferences.getInt("group-selected", 0));
 
 //        SharedPreferences preferences = getActivity().getSharedPreferences("signal", Context.MODE_PRIVATE);
 //        Log.d("Signal Fragment", "ARGH : " + preferences.getInt("current_spinner", -1));
@@ -162,6 +185,24 @@ public class SignalFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onItemClickListener(Signal item) {
+        Intent signalDetailIntent = new Intent(getContext(), SignalDetailActivity.class);
+        putExtra(signalDetailIntent, item);
+        startActivity(signalDetailIntent);
+    }
+
+    private void putExtra(Intent intent, Signal item) {
+        intent.putExtra("title", item.getTitle());
+        intent.putExtra("content", item.getContent());
+        intent.putExtra("last-update", item.getLastUpdate().getTime());
+        intent.putExtra("currency-pair", item.getCurrencyPair());
+        intent.putExtra("result", item.getResult());
+        intent.putExtra("order-type", item.getOrderType());
+        intent.putExtra("status", item.getStatus());
+        intent.putExtra("group", item.getSignalGroup());
     }
 
     /**
@@ -246,6 +287,48 @@ public class SignalFragment extends Fragment {
 //            }
 //        });
 //    }
+
+    AdapterView.OnItemSelectedListener statusSelected = new AdapterView.OnItemSelectedListener() {
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            viewModel.setSignalFilter(position, currencySpinner.getSelectedItemPosition(), groupSpinner.getSelectedItemPosition());
+            SharedPreferences preferences = getActivity().getSharedPreferences("spinner-select", Context.MODE_PRIVATE);
+            preferences.edit().putInt("status-selected", position).apply();
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
+
+        }
+    };
+
+    AdapterView.OnItemSelectedListener pairSelected = new AdapterView.OnItemSelectedListener() {
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            viewModel.setSignalFilter(statusSpinner.getSelectedItemPosition(), position, groupSpinner.getSelectedItemPosition());
+            SharedPreferences preferences = getActivity().getSharedPreferences("spinner-select", Context.MODE_PRIVATE);
+            preferences.edit().putInt("pair-selected", position).apply();
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
+
+        }
+    };
+
+    AdapterView.OnItemSelectedListener groupSelected = new AdapterView.OnItemSelectedListener() {
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            viewModel.setSignalFilter(statusSpinner.getSelectedItemPosition(), currencySpinner.getSelectedItemPosition(), position);
+            SharedPreferences preferences = getActivity().getSharedPreferences("spinner-select", Context.MODE_PRIVATE);
+            preferences.edit().putInt("group-selected", position).apply();
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
+
+        }
+    };
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

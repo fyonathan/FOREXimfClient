@@ -1,21 +1,16 @@
 package com.foreximf.client.services;
 
-import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.arch.lifecycle.LiveData;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.app.TaskStackBuilder;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.foreximf.client.MainActivity;
@@ -24,20 +19,13 @@ import com.foreximf.client.database.ForexImfAppDatabase;
 import com.foreximf.client.news.News;
 import com.foreximf.client.news.NewsViewModel;
 import com.foreximf.client.signal.Signal;
+import com.foreximf.client.signal.SignalRepository;
 import com.foreximf.client.util.ArchLifecycleApp;
+import com.foreximf.client.util.DateFormatter;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.TimeZone;
 
 public class CloudMessagingService extends FirebaseMessagingService {
 
@@ -48,46 +36,41 @@ public class CloudMessagingService extends FirebaseMessagingService {
     public void onMessageReceived(RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
 
-        Log.d("Cloud Messaging Service", "Broadcast Type : " + remoteMessage.getData().get("broadcast_type"));
+        Log.d("CloudMessagingService", "Broadcast Type : " + remoteMessage.getData().get("broadcast_type"));
 
         ForexImfAppDatabase appDatabase = ForexImfAppDatabase.getDatabase(this.getApplication());
-        String dateArray = remoteMessage.getData().get("created_at");
-        String dateString = "";
-        try {
-            dateString = new JSONObject(dateArray).getString("date");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        String newDateString = "";
-        Date date = new Date(System.currentTimeMillis());
-        try {
-            date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH).parse(dateString);
-            SimpleDateFormat sdfOutput = new SimpleDateFormat("dd MMM, HH:mm", Locale.ENGLISH);
-            sdfOutput.setTimeZone(TimeZone.getTimeZone("Asia/Jakarta"));
-            newDateString = sdfOutput.format(date);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        Date date = DateFormatter.format(remoteMessage.getData().get("created_at"));
+        String newDateString = DateFormatter.format(remoteMessage.getData().get("created_at"), "dd MMM, HH:mm");
         switch (remoteMessage.getData().get("broadcast_type")) {
             case "signal" : {
-                String type;
-                if(remoteMessage.getData().get("type").equals("0")) {
-                    type = "News";
-                }else {
-                    type = "Keterangan";
+//                String type;
+//                if(remoteMessage.getData().get("type").equals("0")) {
+//                    type = "News";
+//                }else {
+//                    type = "Keterangan";
+//                }
+                SignalRepository repository = new SignalRepository(getApplication());
+                Signal signal = repository.getSignalByServerId(Integer.parseInt(remoteMessage.getData().get("id")));
+                if(signal != null) {
+                    Log.d("CloudMessagingService", "Signal Server Id : " + signal.getServerId());
+                    Log.d("CloudMessagingService", "Signal Title : " + signal.getTitle());
+                    Log.d("CloudMessagingService", "Signal Status : " + signal.getStatus());
+                    Log.d("CloudMessagingService", "Signal Result : " + remoteMessage.getData().get("result"));
+                    signal.setLastUpdate(date);
+                    signal.setStatus(Integer.parseInt(remoteMessage.getData().get("status")));
+                    signal.setResult(Integer.parseInt(remoteMessage.getData().get("result")));
+                }else{
+                    signal = new Signal(remoteMessage.getData().get("title"), remoteMessage.getData().get("content"), date, 0, Integer.parseInt(remoteMessage.getData().get("currency_pair")), Integer.parseInt(remoteMessage.getData().get("order_type")), Integer.parseInt(remoteMessage.getData().get("result")), Integer.parseInt(remoteMessage.getData().get("status")), Integer.parseInt(remoteMessage.getData().get("signal_group")), Integer.parseInt(remoteMessage.getData().get("id")));
+                    Log.d("CloudMessagingService", "Signal Status : " + signal.getStatus());
                 }
-                Signal signal = new Signal(remoteMessage.getData().get("title"), remoteMessage.getData().get("content"), type, date, 0);
-                appDatabase.signalModel().addSignal(signal);
+                if(Integer.parseInt(remoteMessage.getData().get("status")) == 2)
+                    repository.addSignal(signal);
+                else
+                    repository.updateSignal(signal);
                 break;
             }
             case "news" : {
                 String type = News.typeConverter(Integer.parseInt(remoteMessage.getData().get("type")));
-//                List<News> newsList = new ArrayList<>(appDatabase.newsModel().getNews());
-//                newsList.set(Integer.parseInt(remoteMessage.getData().get("type")), new News(type, remoteMessage.getData().get("title"), remoteMessage.getData().get("content"), date));
-//                appDatabase.newsModel().deleteAll();
-//                appDatabase.newsModel().addNews(newsList.get(0));
-//                appDatabase.newsModel().addNews(newsList.get(1));
-//                appDatabase.newsModel().addNews(newsList.get(2));
                 NewsViewModel newsViewModel = new NewsViewModel(getApplication());
                 News newsDbGet = appDatabase.newsModel().getNewsByType(type);
                 if(newsDbGet != null) {
@@ -97,12 +80,6 @@ public class CloudMessagingService extends FirebaseMessagingService {
                     News news = new News(type, remoteMessage.getData().get("title"), remoteMessage.getData().get("content"), remoteMessage.getData().get("author"), date);
                     newsViewModel.addNews(news);
                 }
-//                News newsUpdate = new News(newsDbGet.id, type, remoteMessage.getData().get("title"), remoteMessage.getData().get("content"), date);
-//                News news = new News(type, remoteMessage.getData().get("title"), remoteMessage.getData().get("content"), date);
-//                appDatabase.newsModel().deleteNews(newsDbGet);
-//                appDatabase.newsModel().addNews(newsUpdate);
-//                appDatabase.newsModel().updateNews(remoteMessage.getData().get("title"), remoteMessage.getData().get("content"), date, type);
-//                }
                 break;
             }
             default : {

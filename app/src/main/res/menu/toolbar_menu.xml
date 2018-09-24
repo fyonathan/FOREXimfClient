@@ -4,11 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MainActivity">
 
-    <item
-        android:id="@+id/action_favorite"
-        android:orderInCategory="300"
-        android:title="User"
-        android:icon="@mipmap/ic_add_alarm"
-        app:showAsAction="ifRoom"></item>
+    <!--<item-->
+        <!--android:id="@+id/action_favorite"-->
+        <!--android:orderInCategory="300"-->
+        <!--android:title="User"-->
+        <!--android:icon="@mipmap/ic_add_alarm"-->
+        <!--app:showAsAction="ifRoom"></item>-->
 
 </menu>

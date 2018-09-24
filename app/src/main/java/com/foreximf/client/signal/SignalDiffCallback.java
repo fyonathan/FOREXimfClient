@@ -5,12 +5,16 @@ import android.support.v7.util.DiffUtil;
 
 import java.util.List;
 
+/**
+ * A utility class responsible to manage the change
+ * of the data in {@link SignalRecyclerViewAdapter}
+ */
 public class SignalDiffCallback extends DiffUtil.Callback {
 
     private final List<Signal> oldSignal;
     private final List<Signal> newSignal;
 
-    public SignalDiffCallback(List<Signal> oldSignal, List<Signal> newSignal) {
+    SignalDiffCallback(List<Signal> oldSignal, List<Signal> newSignal) {
         this.oldSignal = oldSignal;
         this.newSignal = newSignal;
     }

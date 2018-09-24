@@ -33,7 +33,7 @@ public class NewsDetailActivity extends AppCompatActivity {
         author.setText(new StringBuilder().append("by ").append(getIntent().getStringExtra("author")));
 //
         TextView lastUpdateTime = findViewById(R.id.news_detail_time);
-        SimpleDateFormat sdfOutput = new SimpleDateFormat("dd/MM/YY, HH:mm", Locale.ENGLISH);
+        SimpleDateFormat sdfOutput = new SimpleDateFormat("dd/MM/yy, HH:mm", Locale.ENGLISH);
         sdfOutput.setTimeZone(TimeZone.getTimeZone("Asia/Jakarta"));
         lastUpdateTime.setText(new StringBuilder().append(sdfOutput.format(DateConverter.toDate(getIntent().getLongExtra("last-update-time", 0)))).append(" WIB / ").toString());
     }
