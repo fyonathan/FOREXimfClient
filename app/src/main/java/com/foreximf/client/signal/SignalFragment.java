@@ -8,9 +8,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -21,11 +23,28 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.foreximf.client.MainActivity;
 import com.foreximf.client.R;
+import com.foreximf.client.util.DateConverter;
+import com.foreximf.client.util.DateFormatter;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -57,6 +76,13 @@ public class SignalFragment extends Fragment implements SignalViewHolder.ViewHol
     private Spinner statusSpinner, currencySpinner, groupSpinner;
     private SignalViewHolder.ViewHolderListener listener;
     private Observer<List<Signal>> signalObserver;
+    SwipeRefreshLayout mSwipeRefreshLayout;
+
+    private static final int PAGE_START = 0;
+    private boolean isLoading = false;
+    private boolean isLastPage = false;
+    private int TOTAL_PAGES = 3;
+    private int currentPage = PAGE_START;
 
     public SignalFragment() {
         // Required empty public constructor
@@ -102,6 +128,9 @@ public class SignalFragment extends Fragment implements SignalViewHolder.ViewHol
         layoutManager.setReverseLayout(true);
         layoutManager.setStackFromEnd(true);
         signalListView.setLayoutManager(layoutManager);
+
+        mSwipeRefreshLayout = view.findViewById(R.id.swipe_layout);
+        mSwipeRefreshLayout.setOnRefreshListener(onRefreshListener);
 
         //News news = new News("Breaking News", "Yen Menguat", "Test Content");
 //        ArrayList<Signal> _signalList = new ArrayList<>();
@@ -161,6 +190,87 @@ public class SignalFragment extends Fragment implements SignalViewHolder.ViewHol
 //        }
 
         return view;
+    }
+
+    SwipeRefreshLayout.OnRefreshListener onRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
+        @Override
+        public void onRefresh() {
+            refreshItems();
+        }
+    };
+
+    void refreshItems() {
+        // Load items
+        // ...
+
+        // Load complete
+        onItemsLoadComplete();
+    }
+
+    void onItemsLoadComplete() {
+        // Update the adapter and notify data set changed
+        // ...
+
+        // Stop refresh animation
+        mSwipeRefreshLayout.setRefreshing(false);
+    }
+
+    private void upDateItems() {
+        String url = "https://client.foreximf.com/update-signal";
+        RequestQueue queue = Volley.newRequestQueue(getContext());
+
+        SharedPreferences preferences = getActivity().getSharedPreferences("signal", Context.MODE_PRIVATE);
+        long time = preferences.getLong("last-update-time", 0);
+        Map<String, String>  params = new HashMap<>();
+        Date date = DateConverter.toDate(time);
+        String dateString = DateFormatter.format(date, "yyyy-MM-dd HH:mm:ss");
+        String token = preferences.getString("login-token", "");
+        params.put("token", token);
+        params.put("update-time", dateString);
+        JSONObject parameters = new JSONObject(params);
+        JsonObjectRequest postRequest = new JsonObjectRequest(Request.Method.POST, url, parameters,
+                response -> {
+                    // response
+                    try {
+                        boolean error = response.getBoolean("error");
+                        if(!error) {
+                            boolean needToUpdate = response.getBoolean("need-to-update");
+                            if(needToUpdate) {
+                                String dateString2 = response.getString("last-update-time");
+                                preferences.edit().putString("last-update-time", dateString2).apply();
+                                JSONArray signalArray = response.getJSONArray("signals");
+                                for(int i = 0 ; i < signalArray.length() ; i++) {
+                                    JSONObject signalJson = signalArray.getJSONObject(i);
+                                    String signalTitle = signalJson.getString("title");
+                                    String signalContent = signalJson.getString("content");
+                                    Date signalDate = DateFormatter.format(signalJson.getString("updated_at"));
+                                    int signalRead = 0;
+                                    int signalPair = signalJson.getInt("currency_pair");
+                                    int signalOrderType = signalJson.getInt("order_type");
+                                    int signalResult = signalJson.getInt("result");
+                                    int signalStatus = signalJson.getInt("status");
+                                    int signalGroup = signalJson.getInt("group");
+                                    int signalId = signalJson.getInt("id");
+                                    Signal signal = new Signal(signalTitle, signalContent, signalDate, signalRead, signalPair, signalOrderType, signalResult, signalStatus, signalGroup, signalId);
+                                    SignalRepository repository = new SignalRepository(getActivity().getApplication());
+                                    if(signal.getStatus() == 2) {
+                                        repository.addSignal(signal);
+                                    }else{
+                                        repository.updateSignal(signal);
+                                    }
+                                }
+                            }
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                },
+                error -> {
+                    // error
+                    Log.d("Error.Response", "" + error.getMessage());
+                }
+        );
+        queue.add(postRequest);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -224,18 +334,42 @@ public class SignalFragment extends Fragment implements SignalViewHolder.ViewHol
         @Override
         public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
             super.onScrollStateChanged(recyclerView, newState);
-            if(!recyclerView.canScrollVertically(-1)) {
-                //Pass order to delete badge
-                viewModel.updateSignalRead();
-                mListener.onFragmentInteraction(0);
-            }
+//            if(!recyclerView.canScrollVertically(-1)) {
+//                //Pass order to delete badge
+//                viewModel.updateSignalRead();
+//                mListener.onFragmentInteraction(0);
+//            }
         }
 
         @Override
         public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
             super.onScrolled(recyclerView, dx, dy);
+            int itemCount = layoutManager.getItemCount();
+            int lastVisiblePosition = layoutManager.findLastVisibleItemPosition();
+            layoutManager.getChildCount();
+//            int visibleThreshold = 10;
+            if(!isLoading && itemCount - 1 == lastVisiblePosition) {
+                loadMoreItems();
+            }
         }
     };
+
+    public void loadMoreItems() {
+        isLoading = true;
+        currentPage += 1;
+    }
+
+    public int getTotalPageCount() {
+        return TOTAL_PAGES;
+    }
+
+    public boolean isLastPage() {
+        return isLastPage;
+    }
+
+    public boolean isLoading() {
+        return isLoading;
+    }
 
 //    @Override
 //    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {

@@ -24,13 +24,6 @@ public class AlarmViewHolder extends RecyclerView.ViewHolder {
         name = itemView.findViewById(R.id.assistant_item_title);
         time = itemView.findViewById(R.id.assistant_item_time);
         toggle = itemView.findViewById(R.id.assistant_item_switch);
-    }
-
-    public void setAlarm(Alarm _alarm) {
-        alarm = _alarm;
-        icon.setImageResource(R.mipmap.ic_alarm);
-        name.setText(alarm.getName());
-        time.setText(DateFormatter.format(alarm.getReminderTime(), "d MMM yyyy - HH:mm"));
         toggle.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if(isChecked) {
                 //Alarm On
@@ -38,5 +31,18 @@ public class AlarmViewHolder extends RecyclerView.ViewHolder {
                 //Alarm Off
             }
         });
+        itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Open Alarm Activity
+            }
+        });
+    }
+
+    public void setAlarm(Alarm _alarm) {
+        alarm = _alarm;
+        icon.setImageResource(R.mipmap.ic_alarm);
+        name.setText(alarm.getName());
+        time.setText(DateFormatter.format(alarm.getReminderTime(), "d MMM yyyy - HH:mm"));
     }
 }

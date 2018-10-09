@@ -31,6 +31,7 @@ public interface SignalDao {
 
     @Query("select * from Signal where status in (:status) and currencyPair in (:pair) and signalGroup in (:group) order by status desc, lastUpdate asc")
     LiveData<List<Signal>> getSignalByCondition(List<Integer> status, List<Integer> pair, List<Integer> group);
+//    LivePagedListBuilder<Integer, Signal> getSignalByCondition(List<Integer> status, List<Integer> pair, List<Integer> group);
 
     @Query("select count(id) from Signal where read = 0")
     int getUnreadCount();

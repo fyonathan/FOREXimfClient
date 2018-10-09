@@ -22,6 +22,7 @@ public class SignalViewHolder extends RecyclerView.ViewHolder {
     private TextView currencyText;
     private ImageView orderTypeText;
     private TextView resultText;
+    private TextView activeText;
     private Signal item;
 
     public interface ViewHolderListener {
@@ -37,6 +38,7 @@ public class SignalViewHolder extends RecyclerView.ViewHolder {
         currencyText = itemView.findViewById(R.id.signal_item_currency);
         orderTypeText = itemView.findViewById(R.id.signal_item_order_type);
         resultText = itemView.findViewById(R.id.signal_item_result);
+        activeText = itemView.findViewById(R.id.active_text);
         itemView.setOnClickListener(v -> listener.onItemClickListener(item));
     }
 
@@ -60,6 +62,7 @@ public class SignalViewHolder extends RecyclerView.ViewHolder {
                 resultText.setTextColor(Color.RED);
             }
             resultText.setText(result);
+            activeText.setVisibility(View.INVISIBLE);
         }
     }
 }

@@ -10,6 +10,21 @@
     android:elevation="1dp">
 
     <TextView
+        android:id="@+id/active_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="3dp"
+        android:paddingStart="7dp"
+        android:paddingLeft="7dp"
+        android:paddingEnd="7dp"
+        android:paddingRight="7dp"
+        android:text="@string/active"
+        android:textSize="12sp"
+        android:textColor="@color/colorWhite"
+        android:background="@drawable/active_bg"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+    <TextView
         android:id="@+id/signal_item_title"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"

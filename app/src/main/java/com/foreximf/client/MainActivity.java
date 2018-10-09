@@ -1,7 +1,10 @@
 package com.foreximf.client;
 
+import android.content.Intent;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.support.design.internal.BottomNavigationMenuView;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.arch.lifecycle.Observer;
@@ -15,6 +18,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -30,7 +34,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -38,6 +44,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.foreximf.client.assistant.AssistantFragment;
 import com.foreximf.client.news.News;
@@ -57,8 +64,10 @@ import org.json.JSONObject;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TimeZone;
 
 import q.rorbin.badgeview.Badge;
@@ -86,6 +95,14 @@ public class MainActivity extends AppCompatActivity implements SignalFragment.On
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(R.style.AppTheme);
+        SharedPreferences loginPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+//        loginPreferences.edit().remove("login-token").apply();
+        String token = loginPreferences.getString("login-token", "");
+//        Log.d("MainActivity", "Token : " + token);
+        if(token.isEmpty()) {
+            moveToLoginActivity();
+        }
 
         NotificationManagerCompat.from(this).cancelAll();
 
@@ -98,46 +115,10 @@ public class MainActivity extends AppCompatActivity implements SignalFragment.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        FirebaseMessaging.getInstance().subscribeToTopic("signal99");
+        //Check Eligibility
+        checkSubscriptionEligibility(token);
+//        FirebaseMessaging.getInstance().subscribeToTopic("signal99");
         FirebaseMessaging.getInstance().subscribeToTopic("news");
-
-        //final ForexImfAppDatabase appDatabase = ForexImfAppDatabase.getDatabase(this.getApplication());
-//        SharedPreferences preferences = getPreferences(Context.MODE_PRIVATE);
-//        long lastUpdate = preferences.getLong("last-update-time", 0);
-//        if(lastUpdate + 86400000 < System.currentTimeMillis()) {
-//            /*  Get updated news from server
-//                Update DB
-//                Update RecyclerView
-//             */
-//            RequestQueue queue = Volley.newRequestQueue(this);
-//
-//            JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, URL, null, new Response.Listener<JSONObject>() {
-//
-//                @Override
-//                public void onResponse(JSONObject response) {
-//                    try {
-//                        JSONArray result = response.getJSONArray("result");
-//                        JSONObject signal = result.getJSONObject(0);
-//                        JSONObject news = result.getJSONObject(1);
-//                        JSONObject analysis = result.getJSONObject(2);
-//                        Log.i("Response Server 1", signal.getString("type"));
-//                        Log.i("Response Server 2", news.getString("type"));
-//                        Log.i("Response Server 3", analysis.getString("type"));
-////                        appDatabase.newsModel().updateNews();
-//                    } catch (JSONException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//            }, new Response.ErrorListener() {
-//
-//                @Override
-//                public void onErrorResponse(VolleyError error) {
-//                    Log.e("Error response", "Error gan!");
-//                }
-//            });
-//
-//            queue.add(request);
-//        }
 
         ft = getSupportFragmentManager().beginTransaction();
         currentFragment = SignalFragment.newInstance();
@@ -148,7 +129,15 @@ public class MainActivity extends AppCompatActivity implements SignalFragment.On
         setSupportActionBar(toolbar);
 
         drawer = findViewById(R.id.drawer);
-        drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+
+        NavigationView navigationView = findViewById(R.id.sidebar);
+        View headerView = navigationView.getHeaderView(0);
+        TextView headerNameText = headerView.findViewById(R.id.header_name_text);
+        headerNameText.setText(loginPreferences.getString("user-name", ""));
+        TextView headerEmailText = headerView.findViewById(R.id.header_email_text);
+        headerEmailText.setText(loginPreferences.getString("user-email", ""));
+        navigationView.setNavigationItemSelectedListener(drawerListener);
+//        drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 
         slidingUpPanelLayout = findViewById(R.id.sliding_layout);
 
@@ -161,6 +150,11 @@ public class MainActivity extends AppCompatActivity implements SignalFragment.On
         getSupportActionBar().setTitle("");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window w = getWindow();
+            w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+        }
 
 //        bottomNavigationView = findViewById(R.id.navigation_view);
 //        bottomNavigationView.setOnNavigationItemSelectedListener(bottomNavListener);
@@ -267,6 +261,25 @@ public class MainActivity extends AppCompatActivity implements SignalFragment.On
         }
     };
 
+    private NavigationView.OnNavigationItemSelectedListener drawerListener = new NavigationView.OnNavigationItemSelectedListener() {
+        @Override
+        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            if(item.getItemId() == R.id.nav_logout) {
+                SharedPreferences loginPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                loginPreferences.edit().remove("login-token").apply();
+                moveToLoginActivity();
+            }
+            drawer.closeDrawer(GravityCompat.START);
+            return true;
+        }
+    };
+
+    void moveToLoginActivity() {
+        Intent loginIntent = new Intent(getApplicationContext(), LoginActivity.class);
+        startActivity(loginIntent);
+        finish();
+    }
+
     private BottomNavigationView.OnNavigationItemSelectedListener bottomNavListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -295,6 +308,36 @@ public class MainActivity extends AppCompatActivity implements SignalFragment.On
             return false;
         }
     };
+
+    private void checkSubscriptionEligibility(String token) {
+        String url = "https://client.foreximf.com/eligibility-check";
+        RequestQueue queue = Volley.newRequestQueue(this);
+        StringRequest postRequest = new StringRequest(Request.Method.POST, url,
+                response -> {
+                    // response
+                    if(response.equals("true")) {
+                        FirebaseMessaging.getInstance().subscribeToTopic("signal");
+                    }else{
+                        FirebaseMessaging.getInstance().unsubscribeFromTopic("signal");
+                    }
+                    Log.d("MainActivity", response);
+                },
+                error -> {
+                    // error
+                    Log.d("Error.Response", "" + error.getMessage());
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams()
+            {
+                Map<String, String>  params = new HashMap<>();
+                params.put("token", token);
+
+                return params;
+            }
+        };
+        queue.add(postRequest);
+    }
 
     private void changeBadgeStatus(int unreadCount) {
 //        BottomNavigationMenuView bottomNavigationMenuView =
