@@ -1,6 +1,7 @@
 package com.foreximf.client.signal;
 
 import android.arch.lifecycle.LiveData;
+import android.arch.paging.DataSource;
 import android.arch.persistence.room.Dao;
 //import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
@@ -18,7 +19,7 @@ import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
 public interface SignalDao {
 
     @Query("select * from Signal")
-    LiveData<List<Signal>> getAllSignal();
+    DataSource.Factory<Integer, Signal> getAllSignal();
 
     @Query("select * from Signal where serverId = :serverId")
     Signal getSignalByServerId(int serverId);
@@ -30,7 +31,8 @@ public interface SignalDao {
 //    LiveData<List<Signal>> getSignalByStatus(List<Integer> status);
 
     @Query("select * from Signal where status in (:status) and currencyPair in (:pair) and signalGroup in (:group) order by status desc, lastUpdate asc")
-    LiveData<List<Signal>> getSignalByCondition(List<Integer> status, List<Integer> pair, List<Integer> group);
+//    LiveData<List<Signal>> getSignalByCondition(List<Integer> status, List<Integer> pair, List<Integer> group);
+    DataSource.Factory<Integer, Signal> getSignalByCondition(List<Integer> status, List<Integer> pair, List<Integer> group);
 //    LivePagedListBuilder<Integer, Signal> getSignalByCondition(List<Integer> status, List<Integer> pair, List<Integer> group);
 
     @Query("select count(id) from Signal where read = 0")

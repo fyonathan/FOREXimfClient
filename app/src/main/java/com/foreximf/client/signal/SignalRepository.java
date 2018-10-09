@@ -2,11 +2,11 @@ package com.foreximf.client.signal;
 
 import android.app.Application;
 import android.arch.lifecycle.LiveData;
+import android.arch.paging.LivePagedListBuilder;
+import android.arch.paging.PagedList;
 import android.os.AsyncTask;
 
 import com.foreximf.client.database.ForexImfAppDatabase;
-
-import java.util.List;
 
 /**
  * A repository class, as the mediator of query called in
@@ -15,12 +15,12 @@ import java.util.List;
  */
 public class SignalRepository {
     private SignalDao signalDao;
-    private LiveData<List<Signal>> signalLiveData;
+    private android.arch.paging.DataSource.Factory<Integer, Signal> signalDataSource;
 
     public SignalRepository(Application application) {
         ForexImfAppDatabase appDatabase = ForexImfAppDatabase.getDatabase(application);
         signalDao = appDatabase.signalModel();
-        signalLiveData = signalDao.getAllSignal();
+        signalDataSource = signalDao.getAllSignal();
     }
 
 //    public LiveData<List<Signal>> getAllSignal() {
@@ -40,8 +40,10 @@ public class SignalRepository {
 //        return signalLiveData;
 //    }
 
-    public LiveData<List<Signal>> getSignalByCondition(SignalFilter filter) {
-        signalLiveData = signalDao.getSignalByCondition(filter.getStatus(), filter.getPair(), filter.getGroup());
+    public LiveData<PagedList<Signal>> getSignalByCondition(SignalFilter filter) {
+        signalDataSource = signalDao.getSignalByCondition(filter.getStatus(), filter.getPair(), filter.getGroup());
+        LiveData<PagedList<Signal>> signalLiveData = new LivePagedListBuilder<>(signalDataSource, 5)
+                .build();
         return signalLiveData;
     }
 

@@ -1,8 +1,8 @@
 package com.foreximf.client.signal;
 
+import android.arch.paging.PagedListAdapter;
 import android.support.annotation.NonNull;
 import android.support.v7.util.DiffUtil;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +13,7 @@ import com.foreximf.client.R;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SignalRecyclerViewAdapter extends RecyclerView.Adapter<SignalViewHolder> {
+public class SignalRecyclerViewAdapter extends PagedListAdapter<Signal, SignalViewHolder> {
 //    private boolean isLoadingAdded = false;
 //
 //    private final int ITEM = 1;
@@ -29,6 +29,7 @@ public class SignalRecyclerViewAdapter extends RecyclerView.Adapter<SignalViewHo
 //    private OnLoadMoreListener onLoadMoreListener;
 
     SignalRecyclerViewAdapter(LayoutInflater _inflater, SignalViewHolder.ViewHolderListener _listener) {
+        super(DIFF_CALLBACK);
         this.signalList = new ArrayList<>();
         this.listener = _listener;
         this.inflater = _inflater;
@@ -44,10 +45,24 @@ public class SignalRecyclerViewAdapter extends RecyclerView.Adapter<SignalViewHo
     @Override
     public void onBindViewHolder(@NonNull SignalViewHolder holder, int position) {
         Signal signal = signalList.get(position);
-        SignalViewHolder viewHolder = (SignalViewHolder) holder;
         holder.setContent(signal);
-        viewHolder.setContent(signal);
     }
+
+    private static DiffUtil.ItemCallback<Signal> DIFF_CALLBACK =
+        new DiffUtil.ItemCallback<Signal>() {
+            // The ID property identifies when items are the same.
+            @Override
+            public boolean areItemsTheSame(Signal oldItem, Signal newItem) {
+                return oldItem.getId() == newItem.getId();
+            }
+
+            // Use Object.equals() to know when an item's content changes.
+            // Implement equals(), or write custom data comparison logic here.
+            @Override
+            public boolean areContentsTheSame(Signal oldItem, Signal newItem) {
+                return oldItem.equals(newItem);
+            }
+        };
 
 //    @Override
 //    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
@@ -74,6 +89,8 @@ public class SignalRecyclerViewAdapter extends RecyclerView.Adapter<SignalViewHo
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new SignalDiffCallback(oldList, signalList));
         diffResult.dispatchUpdatesTo(this);
     }
+
+
 
 //    public void add(Signal signal) {
 //        signalList.add(signal);

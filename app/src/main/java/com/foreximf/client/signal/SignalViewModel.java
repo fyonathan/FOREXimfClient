@@ -5,6 +5,7 @@ import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Transformations;
+import android.arch.paging.PagedList;
 import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ import java.util.List;
 public class SignalViewModel extends AndroidViewModel {
 
     private SignalRepository repository;
-    private LiveData<List<Signal>> signalLiveData;
+    private LiveData<PagedList<Signal>> signalLiveData;
     private SignalFilterLiveData signalFilterLiveData;
 
     public SignalViewModel(@NonNull Application application) {
@@ -67,7 +68,7 @@ public class SignalViewModel extends AndroidViewModel {
         this.signalFilterLiveData.setValue(new SignalFilter(tempStatus, tempPair, tempGroup));
     }
 
-    public LiveData<List<Signal>> getAllSignal() {
+    public LiveData<PagedList<Signal>> getAllSignal() {
         return signalLiveData;
     }
 

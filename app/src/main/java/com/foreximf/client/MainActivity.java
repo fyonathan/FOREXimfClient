@@ -169,8 +169,8 @@ public class MainActivity extends AppCompatActivity implements SignalFragment.On
         newsViewModel = ViewModelProviders.of(this).get(NewsViewModel.class);
         newsViewModel.getAllNews().observe(this, newsObserver);
 
-        signalViewModel = ViewModelProviders.of(this).get(SignalViewModel.class);
-        signalViewModel.getAllSignal().observe(this, signalObserver);
+//        signalViewModel = ViewModelProviders.of(this).get(SignalViewModel.class);
+//        signalViewModel.getAllSignal().observe(this, signalObserver);
 
         slidingUpPanelLayout.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
             @Override

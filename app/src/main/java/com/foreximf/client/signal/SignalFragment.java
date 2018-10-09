@@ -3,6 +3,7 @@ package com.foreximf.client.signal;
 import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.arch.paging.PagedList;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -75,7 +76,7 @@ public class SignalFragment extends Fragment implements SignalViewHolder.ViewHol
 
     private Spinner statusSpinner, currencySpinner, groupSpinner;
     private SignalViewHolder.ViewHolderListener listener;
-    private Observer<List<Signal>> signalObserver;
+    private Observer<PagedList<Signal>> signalObserver;
     SwipeRefreshLayout mSwipeRefreshLayout;
 
     private static final int PAGE_START = 0;
