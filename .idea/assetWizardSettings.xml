@@ -23,7 +23,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="scalingPercent" value="60" />
+                                                <entry key="scalingPercent" value="62" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -34,8 +34,8 @@
                                   <option name="values">
                                     <map>
                                       <entry key="backgroundAssetType" value="COLOR" />
-                                      <entry key="backgroundColor" value="ffffff" />
-                                      <entry key="foregroundImage" value="D:\Codes\AndroidStudioProjects\FOREXimfClient\app\src\main\res\mipmap-xxxhdpi\ic_launcher.png" />
+                                      <entry key="backgroundColor" value="e5e5e5" />
+                                      <entry key="foregroundImage" value="C:\Users\HP USER\Downloads\Foreximf Square.png" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -63,7 +63,7 @@
                           <map>
                             <entry key="assetSourceType" value="FILE" />
                             <entry key="outputName" value="ic_launcher" />
-                            <entry key="sourceFile" value="D:\Codes\AndroidStudioProjects\FOREXimfClient\app\src\main\res\ic_launcher.psd" />
+                            <entry key="sourceFile" value="C:\Users\HP USER\Downloads\ic_launcher.psd" />
                           </map>
                         </option>
                       </PersistentState>

@@ -4,4 +4,5 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
 
     <dimen name="navigation_drawer_width">280dp</dimen>
+    <dimen name="currency_text_size">24sp</dimen>
 </resources>
