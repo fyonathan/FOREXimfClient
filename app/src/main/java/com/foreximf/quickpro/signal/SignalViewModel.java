@@ -46,6 +46,7 @@ public class SignalViewModel extends AndroidViewModel {
         if(status == 0) {
             tempStatus.add(2);
             tempStatus.add(3);
+            tempStatus.add(4);
         }else{
             tempStatus.add(status + 1);
         }

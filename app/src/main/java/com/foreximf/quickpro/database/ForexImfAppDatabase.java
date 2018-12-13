@@ -16,7 +16,7 @@ import com.foreximf.quickpro.signal.Signal;
 import com.foreximf.quickpro.signal.SignalDao;
 import com.foreximf.quickpro.util.DateConverter;
 
-@Database(entities = {News.class, Signal.class, Camarilla.class}, version = 2)
+@Database(entities = {News.class, Signal.class, Camarilla.class}, version = 3)
 @TypeConverters({DateConverter.class})
 public abstract class ForexImfAppDatabase extends RoomDatabase {
 
@@ -28,7 +28,7 @@ public abstract class ForexImfAppDatabase extends RoomDatabase {
                 if(INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                             ForexImfAppDatabase.class, "foreximf_db")
-                            .addMigrations(MIGRATION_1_2)
+                            .addMigrations(MIGRATION_2_3)
                             .build();
                 }
             }
@@ -36,11 +36,19 @@ public abstract class ForexImfAppDatabase extends RoomDatabase {
         return INSTANCE;
     }
 
-    static final Migration MIGRATION_1_2 = new Migration(1, 2) {
+//    static final Migration MIGRATION_1_2 = new Migration(1, 2) {
+//        @Override
+//        public void migrate(SupportSQLiteDatabase database) {
+//            database.execSQL("ALTER TABLE signal "
+//                    + " ADD COLUMN keterangan VARCHAR");
+//        }
+//    };
+
+    static final Migration MIGRATION_2_3 = new Migration(2, 3) {
         @Override
         public void migrate(SupportSQLiteDatabase database) {
-            database.execSQL("ALTER TABLE signal "
-                    + " ADD COLUMN keterangan VARCHAR");
+            database.execSQL("UPDATE signal "
+                    + " SET status = 4 WHERE status = 3");
         }
     };
 

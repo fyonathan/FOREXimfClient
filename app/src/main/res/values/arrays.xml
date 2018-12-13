@@ -3,6 +3,7 @@
     <string-array name="spinner_status_list_item_array">
         <item>All</item>
         <item>Active</item>
+        <item>Switching</item>
         <item>Done</item>
     </string-array>
     <string-array name="spinner_currency_list_item_array">
@@ -33,5 +34,7 @@
         <item>FiboStoch</item>
         <item>Atrium</item>
         <item>EMAStoch</item>
+        <item>Price Pattern</item>
+        <item>Counter Trend</item>
     </string-array>
 </resources>

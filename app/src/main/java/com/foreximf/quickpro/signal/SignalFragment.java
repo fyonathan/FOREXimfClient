@@ -14,6 +14,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -244,6 +245,7 @@ public class SignalFragment extends Fragment implements SignalViewHolderListener
 //        String dateString = DateFormatter.format(date, "yyyy-MM-dd HH:mm:ss");
         String token = preferences.getString("login-token", "");
 //        Log.d("SignalFragment", "Token : " + token);
+//        Log.d("Signal Fragment", "Update Time : " + time);
         params.put("token", token);
         params.put("update-time", time);
         JSONObject parameters = new JSONObject(params);
@@ -253,11 +255,13 @@ public class SignalFragment extends Fragment implements SignalViewHolderListener
                     // response
                     try {
                         boolean error = response.getBoolean("error");
+//                        Log.d("SignalFragment", "ERROR : " + error);
 //                        Log.d("SignalFragment", "Error : " + error);
 //                        Log.d("SignalFragment", "Eligible : " + response.getString("tes"));
                         if(!error) {
                             boolean needToUpdate = response.getBoolean("need-to-update");
 //                            Log.d("SignalFragment", "Need to Update : " + needToUpdate);
+//                            Log.d("SignalFragment", "Last Update Time : " + response.getJSONObject("last-update-time").getString("date"));
                             if(needToUpdate) {
                                 String dateString = response.getJSONObject("last-update-time").getString("date");
 //                                Date date = DateFormatter.format(dateString);
@@ -267,6 +271,7 @@ public class SignalFragment extends Fragment implements SignalViewHolderListener
                                 for(int i = 0 ; i < signalArray.length() ; i++) {
                                     JSONObject signalJson = signalArray.getJSONObject(i);
                                     String signalTitle = signalJson.getString("title");
+                                    Log.d("SignalFragment", "Status : " + signalJson.getInt("status"));
                                     String signalContent = signalJson.getString("content");
                                     Date signalDate = DateFormatter.format(signalJson.getString("created_at"));
                                     int signalRead = 0;

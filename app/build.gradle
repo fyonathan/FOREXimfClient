@@ -6,8 +6,8 @@ android {
         applicationId "com.foreximf.client"
         minSdkVersion 15
         targetSdkVersion 27
-        versionCode 109
-        versionName "1.0.9"
+        versionCode 1093
+        versionName "1.0.9.3"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

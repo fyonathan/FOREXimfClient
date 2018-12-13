@@ -232,9 +232,11 @@ public class Signal {
 
     public String getSignalGroupString() {
         switch(signalGroup) {
-            case 1 : return "MSARS";
+            case 1 : return "FiboStoch";
             case 2 : return "Atrium";
-            default : return "EMAStoch";
+            case 3 : return "EMAStoch";
+            case 4 : return "Price Pattern";
+            default : return "Counter Trend";
         }
     }
 

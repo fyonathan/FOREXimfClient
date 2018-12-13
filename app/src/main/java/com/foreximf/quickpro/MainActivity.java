@@ -354,6 +354,7 @@ public class MainActivity extends AppCompatActivity implements SignalFragment.On
                     if(response.equals("true")) {
                         FirebaseMessaging.getInstance().subscribeToTopic("signal");
                         FirebaseMessaging.getInstance().subscribeToTopic("camarilla");
+//                        FirebaseMessaging.getInstance().subscribeToTopic("signal-switching");
                     }else{
                         FirebaseMessaging.getInstance().unsubscribeFromTopic("signal");
                         FirebaseMessaging.getInstance().unsubscribeFromTopic("camarilla");
