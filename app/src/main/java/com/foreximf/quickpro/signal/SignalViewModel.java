@@ -61,6 +61,8 @@ public class SignalViewModel extends AndroidViewModel {
             tempGroup.add(1);
             tempGroup.add(2);
             tempGroup.add(3);
+            tempGroup.add(4);
+            tempGroup.add(5);
         }else{
             tempGroup.add(group);
         }
