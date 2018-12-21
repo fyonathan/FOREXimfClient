@@ -3,6 +3,7 @@ package com.foreximf.quickpro.signal;
 import android.support.annotation.NonNull;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +25,8 @@ public class SignalRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
     private SignalViewHolderListener listener;
 
     private final int ACTIVE = 2;
-    private final int DONE = 3;
+    private final int SWITCHING = 3;
+    private final int DONE = 4;
 
 //    private int visibleThreshold = 10;
 //    private int lastVisibleItem, totalItemCount;
@@ -41,13 +43,20 @@ public class SignalRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView;
+        Log.d("SRViewAdapter", "TESTC");
         switch(viewType) {
             case ACTIVE :
                 itemView = inflater.inflate(R.layout.signal_item_layout, parent, false);
                 return new SignalViewHolder(itemView, listener);
-            default :
+            case SWITCHING :
+                Log.d("SRViewAdapter", "TESTA");
+                itemView = inflater.inflate(R.layout.signal_item_switching_layout, parent, false);
+                return new SignalSwitchingViewHolder(itemView, listener);
+            default : {
+                Log.d("SRViewAdapter", "TEST");
                 itemView = inflater.inflate(R.layout.signal_item_done_layout, parent, false);
                 return new SignalDoneViewHolder(itemView, listener);
+            }
         }
 //        View itemView = inflater.inflate(R.layout.signal_item_layout, parent, false);
 
@@ -60,6 +69,12 @@ public class SignalRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
             switch(signal.getStatus()) {
                 case ACTIVE : {
                     SignalViewHolder viewHolder = (SignalViewHolder) holder;
+//                    holder.setContent(signal);
+                    viewHolder.setContent(signal);
+                    break;
+                }
+                case SWITCHING : {
+                    SignalSwitchingViewHolder viewHolder = (SignalSwitchingViewHolder) holder;
 //                    holder.setContent(signal);
                     viewHolder.setContent(signal);
                     break;
@@ -93,6 +108,8 @@ public class SignalRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
             case 2 :
                 return ACTIVE;
             case 3 :
+                return SWITCHING;
+            case 4 :
                 return DONE;
             default :
                 return 0;

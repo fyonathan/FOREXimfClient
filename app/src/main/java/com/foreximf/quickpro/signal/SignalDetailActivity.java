@@ -70,11 +70,11 @@ public class SignalDetailActivity extends AppCompatActivity {
         }
 //        body.setText(signal.getContent());
         TextView result = findViewById(R.id.signal_detail_result);
-        if(signal.getStatus() == 3) {
+        if(signal.getStatus() == 4) {
             result.setText(new StringBuilder("Hasil Trading : ").append(signal.getResult()).append(" pips"));
+            TextView keterangan = findViewById(R.id.signal_detail_keterangan);
+            keterangan.setText(signal.getKeterangan());
         }
-        TextView keterangan = findViewById(R.id.signal_detail_keterangan);
-        keterangan.setText(signal.getKeterangan());
 
         Toolbar toolbar = findViewById(R.id.toolbar_main);
         toolbar.setTitleTextColor(getResources().getColor(android.R.color.white));

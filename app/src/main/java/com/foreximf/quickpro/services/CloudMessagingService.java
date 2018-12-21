@@ -27,6 +27,9 @@ import com.foreximf.quickpro.util.DateFormatter;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Date;
 import java.util.concurrent.ExecutionException;
 
@@ -69,7 +72,18 @@ public class CloudMessagingService extends FirebaseMessagingService {
 //                }else {
 //                    type = "Keterangan";
 //                }
-                    Date date = DateFormatter.format(remoteMessage.getData().get("created_at"));
+                    JSONObject dS = new JSONObject();
+                    try {
+                        dS = new JSONObject(remoteMessage.getData().get("created_at"));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    Date date = null;
+                    try {
+                        date = DateFormatter.format(dS.getString("date"));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                     String newDateString = DateFormatter.format(remoteMessage.getData().get("created_at"), "dd MMM, HH:mm");
                     channelId = "foreximf-signal";
                     SignalRepository repository = new SignalRepository(getApplication());
@@ -108,7 +122,7 @@ public class CloudMessagingService extends FirebaseMessagingService {
 //                        repository.addSignal(signal);
 //                    else
 //                        repository.updateSignal(signal);
-                    if(signal.getStatus() == 2) {
+                    if(signal.getStatus() == 2 || signal.getStatus() == 3) {
                         title = signal.getTitle();
                         content = newDateString;
                     }else{
@@ -117,7 +131,7 @@ public class CloudMessagingService extends FirebaseMessagingService {
                             content = "Antisipasinya, lihat di sini.";
                         }else{
                             title = "\uD83C\uDFC6 UPDATE "+signal.getCurrencyPairString();
-                            content = "Berhail mencapai target "+signal.getResult();
+                            content = "Berhasil mencapai target "+signal.getResult();
                         }
                     }
                     group = "signal-group";
