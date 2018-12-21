@@ -5,8 +5,11 @@ import android.arch.lifecycle.Lifecycle;
 import android.arch.lifecycle.LifecycleObserver;
 import android.arch.lifecycle.OnLifecycleEvent;
 import android.arch.lifecycle.ProcessLifecycleOwner;
+import android.content.Intent;
+import android.util.Log;
 
 import com.foreximf.quickpro.R;
+import com.foreximf.quickpro.services.WebSocketChat;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
 import com.vanniktech.emoji.EmojiManager;
@@ -30,14 +33,17 @@ public class ArchLifecycleApp extends Application implements LifecycleObserver {
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     public void onAppBackgrounded() {
         //App in background
-//        Log.d("Application", "Berhenti");
+        Log.d("Application", "Berhenti");
         isForeground = false;
+        stopService(new Intent(getApplicationContext(), WebSocketChat.class));
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     public void onAppForegrounded() {
         // App in foreground
+        Log.d("Application", "Mulai");
         isForeground = true;
+        startService(new Intent(getApplicationContext(), WebSocketChat.class));
     }
 
     /**

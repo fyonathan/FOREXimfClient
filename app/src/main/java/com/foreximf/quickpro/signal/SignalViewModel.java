@@ -1,6 +1,7 @@
 package com.foreximf.quickpro.signal;
 
 import android.app.Application;
+import android.arch.core.util.Function;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
@@ -28,7 +29,12 @@ public class SignalViewModel extends AndroidViewModel {
         MutableLiveData<List<Integer>> pair = new MutableLiveData<>();
         MutableLiveData<List<Integer>> group = new MutableLiveData<>();
         signalFilterLiveData = new SignalFilterLiveData(status, pair, group);
-        signalLiveData = Transformations.switchMap(signalFilterLiveData, input -> repository.getSignalByCondition(input));
+        signalLiveData = Transformations.switchMap(signalFilterLiveData, new Function<SignalFilter, LiveData<List<Signal>>>() {
+            @Override
+            public LiveData<List<Signal>> apply(SignalFilter input) {
+                return repository.getSignalByCondition(input);
+            }
+        });
     }
 
     /**

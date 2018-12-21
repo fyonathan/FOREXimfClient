@@ -4,20 +4,13 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.preference.PreferenceManager;
-import android.support.design.internal.BottomNavigationMenuView;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.view.GravityCompat;
@@ -25,9 +18,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.transition.Fade;
 import android.util.Log;
@@ -36,19 +26,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.foreximf.quickpro.camarilla.CamarillaFragment;
+import com.foreximf.quickpro.chat.ChatFragment;
 import com.foreximf.quickpro.news.News;
-import com.foreximf.quickpro.news.NewsRecyclerViewAdapter;
 import com.foreximf.quickpro.news.NewsViewModel;
-import com.foreximf.quickpro.signal.Signal;
 import com.foreximf.quickpro.signal.SignalFragment;
 import com.foreximf.quickpro.signal.SignalViewModel;
 import com.foreximf.quickpro.util.ArchLifecycleApp;
@@ -56,7 +43,6 @@ import com.foreximf.quickpro.util.DateFormatter;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.google.firebase.messaging.FirebaseMessaging;
-import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -64,13 +50,9 @@ import org.json.JSONObject;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.TimeZone;
 
 import q.rorbin.badgeview.Badge;
-import q.rorbin.badgeview.QBadgeView;
 
 public class MainActivity extends AppCompatActivity implements SignalFragment.OnFragmentInteractionListener, CamarillaFragment.OnFragmentInteractionListener {
     final String URL = "https://client.foreximf.com/update-news";
@@ -325,6 +307,13 @@ public class MainActivity extends AppCompatActivity implements SignalFragment.On
                     ft = getSupportFragmentManager().beginTransaction();
                     currentFragment = CamarillaFragment.newInstance();
                     ft.replace(R.id.fragment_container, currentFragment, "CAMARILLA");
+                    ft.commit();
+                    return true;
+                }
+                case R.id.action_chat: {
+                    ft = getSupportFragmentManager().beginTransaction();
+                    currentFragment = ChatFragment.newInstance();
+                    ft.replace(R.id.fragment_container, currentFragment, "CHAT");
                     ft.commit();
                     return true;
                 }
