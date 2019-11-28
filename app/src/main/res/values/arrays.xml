@@ -3,24 +3,38 @@
     <string-array name="spinner_status_list_item_array">
         <item>All</item>
         <item>Active</item>
+        <item>Switching</item>
         <item>Done</item>
     </string-array>
     <string-array name="spinner_currency_list_item_array">
         <item>All</item>
-        <item>GBPUSD</item>
+        <item>AUDJPY</item>
+        <item>AUDNZD</item>
+        <item>AUDUSD</item>
+        <item>CHFJPY</item>
+        <item>EURAUD</item>
+        <item>EURCAD</item>
+        <item>EURGBP</item>
+        <item>EURJPY</item>
         <item>EURUSD</item>
-        <item>AURUSD</item>
+        <item>GBPAUD</item>
+        <item>GBPCHF</item>
+        <item>GBPJPY</item>
+        <item>GBPUSD</item>
+        <item>NZDUSD</item>
         <item>USDCAD</item>
         <item>USDCHF</item>
         <item>USDJPY</item>
-        <item>Emas</item>
-        <item>Perak</item>
-        <item>Oil</item>
+        <item>XAG</item>
+        <item>XAU</item>
+        <item>CLSK</item>
     </string-array>
     <string-array name="spinner_group_list_item_array">
         <item>All</item>
-        <item>MSARS</item>
+        <item>FiboStoch</item>
         <item>Atrium</item>
         <item>EMAStoch</item>
+        <item>Price Pattern</item>
+        <item>Counter Trend</item>
     </string-array>
 </resources>

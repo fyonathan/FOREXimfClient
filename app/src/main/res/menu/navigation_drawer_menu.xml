@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
-    <signalGroup android:checkableBehavior="single">
+    <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_camera"
-            android:icon="@mipmap/ic_assistant"
-            android:title="@string/menu_assistant" />
+            android:id="@+id/nav_profile"
+            android:icon="@mipmap/ic_user"
+            android:title="@string/menu_profile" />
 
-    </signalGroup>
+        <item
+            android:id="@+id/nav_logout"
+            android:icon="@mipmap/ic_logout"
+            android:title="@string/menu_logout" />
+
+    </group>
 </menu>

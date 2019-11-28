@@ -1,0 +1,513 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 4,
+    "identityHash": "8ec3c07d9dbbc19dae560c734e10e650",
+    "entities": [
+      {
+        "tableName": "news",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `type` TEXT, `title` TEXT, `content` TEXT, `author` TEXT, `lastUpdate` INTEGER)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "content",
+            "columnName": "content",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "author",
+            "columnName": "author",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "lastUpdate",
+            "columnName": "lastUpdate",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "signal",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `currencyPair` INTEGER NOT NULL, `title` TEXT, `content` TEXT, `createdTime` INTEGER, `orderType` INTEGER NOT NULL, `result` INTEGER NOT NULL, `keterangan` TEXT, `status` INTEGER NOT NULL, `signalGroup` INTEGER NOT NULL, `read` INTEGER NOT NULL, `serverId` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "currencyPair",
+            "columnName": "currencyPair",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "content",
+            "columnName": "content",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "createdTime",
+            "columnName": "createdTime",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "orderType",
+            "columnName": "orderType",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "result",
+            "columnName": "result",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "keterangan",
+            "columnName": "keterangan",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "signalGroup",
+            "columnName": "signalGroup",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "read",
+            "columnName": "read",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "serverId",
+            "columnName": "serverId",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "camarilla",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `pairName` TEXT, `pivot` REAL NOT NULL, `open` REAL NOT NULL, `sellArea` REAL NOT NULL, `sellTp1` REAL NOT NULL, `sellTp2` REAL NOT NULL, `sellSl` REAL NOT NULL, `buyArea` REAL NOT NULL, `buyTp1` REAL NOT NULL, `buyTp2` REAL NOT NULL, `buySl` REAL NOT NULL, `buyBreakoutArea` REAL NOT NULL, `buyBreakoutTp1` REAL NOT NULL, `buyBreakoutTp2` REAL NOT NULL, `buyBreakoutSl` REAL NOT NULL, `sellBreakoutArea` REAL NOT NULL, `sellBreakoutTp1` REAL NOT NULL, `sellBreakoutTp2` REAL NOT NULL, `sellBreakoutSl` REAL NOT NULL, `lastUpdate` INTEGER, `serverId` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pairName",
+            "columnName": "pairName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "pivot",
+            "columnName": "pivot",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "open",
+            "columnName": "open",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sellArea",
+            "columnName": "sellArea",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sellTp1",
+            "columnName": "sellTp1",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sellTp2",
+            "columnName": "sellTp2",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sellSl",
+            "columnName": "sellSl",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "buyArea",
+            "columnName": "buyArea",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "buyTp1",
+            "columnName": "buyTp1",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "buyTp2",
+            "columnName": "buyTp2",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "buySl",
+            "columnName": "buySl",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "buyBreakoutArea",
+            "columnName": "buyBreakoutArea",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "buyBreakoutTp1",
+            "columnName": "buyBreakoutTp1",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "buyBreakoutTp2",
+            "columnName": "buyBreakoutTp2",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "buyBreakoutSl",
+            "columnName": "buyBreakoutSl",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sellBreakoutArea",
+            "columnName": "sellBreakoutArea",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sellBreakoutTp1",
+            "columnName": "sellBreakoutTp1",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sellBreakoutTp2",
+            "columnName": "sellBreakoutTp2",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sellBreakoutSl",
+            "columnName": "sellBreakoutSl",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastUpdate",
+            "columnName": "lastUpdate",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "serverId",
+            "columnName": "serverId",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "chat_department",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `name` TEXT, `avatar` TEXT, `description` TEXT, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "avatar",
+            "columnName": "avatar",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "chat_message",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `id_chat_thread` TEXT, `id_chat_user` TEXT, `type` TEXT, `message` TEXT, `is_read` INTEGER NOT NULL, `sent_count` INTEGER NOT NULL, `read_count` INTEGER NOT NULL, `time` INTEGER, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "id_chat_thread",
+            "columnName": "id_chat_thread",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "id_chat_user",
+            "columnName": "id_chat_user",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "message",
+            "columnName": "message",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "is_read",
+            "columnName": "is_read",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sent_count",
+            "columnName": "sent_count",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "read_count",
+            "columnName": "read_count",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "time",
+            "columnName": "time",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "chat_thread",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `id_chat_department` TEXT, `id_last_message` TEXT, `type` TEXT, `name` TEXT, `avatar` TEXT, `status` INTEGER NOT NULL, `unread` INTEGER NOT NULL, `updated_at` INTEGER, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "id_chat_department",
+            "columnName": "id_chat_department",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "id_last_message",
+            "columnName": "id_last_message",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "avatar",
+            "columnName": "avatar",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "unread",
+            "columnName": "unread",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updated_at",
+            "columnName": "updated_at",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "chat_user",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `name` TEXT, `avatar` TEXT, `status` TEXT, `last_online` INTEGER, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "avatar",
+            "columnName": "avatar",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "last_online",
+            "columnName": "last_online",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"8ec3c07d9dbbc19dae560c734e10e650\")"
+    ]
+  }
+}

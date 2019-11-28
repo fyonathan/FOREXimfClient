@@ -1,28 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    android:layout_width="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context=".signal.SignalDetailActivity"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <android.support.design.widget.AppBarLayout
+    <include
+        layout="@layout/app_bar_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fitsSystemWindows="true"
-        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar_main"
-            android:layout_width="match_parent"
-            android:layout_height="?android:attr/actionBarSize"
-            android:background="#ffffff"
-            app:layout_scrollFlags="scroll|enterAlways"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            app:theme="@style/ActionBarTheme"/>
-
-    </android.support.design.widget.AppBarLayout>
+        android:layout_height="match_parent" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -30,7 +18,8 @@
         android:layout_marginTop="?android:attr/actionBarSize"
         android:elevation="1dp"
         tools:context=".signal.SignalDetailActivity"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        tools:targetApi="lollipop">
         <TextView
             android:id="@+id/signal_detail_date"
             android:layout_width="match_parent"
@@ -62,7 +51,18 @@
                     android:paddingEnd="20dp"
                     android:paddingBottom="10dp"
                     android:textSize="32sp"/>
+                <TextView
+                    android:id="@+id/signal_detail_keterangan"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="20dp"
+                    android:paddingStart="20dp"
+                    android:paddingRight="20dp"
+                    android:paddingEnd="20dp"
+                    android:paddingBottom="10dp"
+                    android:textSize="32sp"/>
             </LinearLayout>
         </ScrollView>
     </LinearLayout>
+
 </android.support.design.widget.CoordinatorLayout>

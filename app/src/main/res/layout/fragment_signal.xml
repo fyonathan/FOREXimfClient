@@ -4,6 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginEnd="8dp"
+    android:layout_marginLeft="8dp"
+    android:layout_marginRight="8dp"
+    android:layout_marginStart="8dp"
     tools:context=".signal.SignalFragment">
 
     <!-- TODO: Update blank fragment layout -->
@@ -11,98 +15,125 @@
         android:id="@+id/spinner_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         app:layout_constraintVertical_bias="0"
-        app:layout_constraintBottom_toTopOf="@id/signal_list_view"
+        app:layout_constraintBottom_toTopOf="@id/swipe_layout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed">
 
-        <android.support.constraint.ConstraintLayout
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/status_container"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:id="@+id/signal_status_spinner_container"
-            android:background="@drawable/spinner_bg"
-            android:layout_marginEnd="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginStart="8dp"
-            app:layout_constraintHorizontal_bias="0.3"
+            android:orientation="vertical"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-            <Spinner
-                style="@style/Widget.AppCompat.DropDownItem.Spinner"
-                android:id="@+id/signal_status_spinner"
+            app:layout_constraintEnd_toStartOf="@id/currency_container"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            app:layout_constraintHorizontal_bias="0.3">
+            <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="50dp"
+                android:layout_height="wrap_content"
+                android:text="Signal Status"/>
+            <android.support.constraint.ConstraintLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/signal_status_spinner_container"
+                android:background="@drawable/spinner_bg"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-        </android.support.constraint.ConstraintLayout>
-        <android.support.constraint.ConstraintLayout
-            android:layout_width="wrap_content"
+                app:layout_constraintTop_toTopOf="parent">
+                <Spinner
+                    style="@style/Widget.AppCompat.DropDownItem.Spinner"
+                    android:id="@+id/signal_status_spinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </android.support.constraint.ConstraintLayout>
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/currency_container"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:id="@+id/signal_currency_spinner_container"
-            android:background="@drawable/spinner_bg"
-            android:layout_marginEnd="8dp"
+            android:orientation="vertical"
+            app:layout_constraintStart_toEndOf="@id/status_container"
+            app:layout_constraintEnd_toStartOf="@id/group_container"
             android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
             android:layout_marginStart="8dp"
-            app:layout_constraintHorizontal_bias="0.3"
-            app:layout_constraintStart_toEndOf="@id/signal_status_spinner_container"
-            app:layout_constraintTop_toTopOf="parent">
-        <Spinner
-            style="@style/Widget.AppCompat.DropDownItem.Spinner"
-            android:id="@+id/signal_currency_spinner"
-            android:layout_width="wrap_content"
-            android:layout_height="50dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-        </android.support.constraint.ConstraintLayout>
-        <android.support.constraint.ConstraintLayout
-            android:layout_width="wrap_content"
+            app:layout_constraintHorizontal_bias="0.3">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pairs"/>
+            <android.support.constraint.ConstraintLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/signal_currency_spinner_container"
+                android:background="@drawable/spinner_bg"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+                <Spinner
+                    style="@style/Widget.AppCompat.DropDownItem.Spinner"
+                    android:id="@+id/signal_currency_spinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </android.support.constraint.ConstraintLayout>
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/group_container"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:id="@+id/signal_group_spinner_container"
-            android:background="@drawable/spinner_bg"
-            android:layout_marginEnd="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginStart="8dp"
-            app:layout_constraintHorizontal_bias="0.3"
-            app:layout_constraintStart_toEndOf="@id/signal_currency_spinner_container"
+            android:orientation="vertical"
+            app:layout_constraintStart_toEndOf="@id/currency_container"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-            <Spinner
-                style="@style/Widget.AppCompat.DropDownItem.Spinner"
-                android:id="@+id/signal_group_spinner"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="8dp"
+            app:layout_constraintHorizontal_bias="0.3">
+            <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="50dp"
+                android:layout_height="wrap_content"
+                android:text="Strategies"/>
+            <android.support.constraint.ConstraintLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/signal_group_spinner_container"
+                android:background="@drawable/spinner_bg"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-        </android.support.constraint.ConstraintLayout>
-
-
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+                <Spinner
+                    style="@style/Widget.AppCompat.DropDownItem.Spinner"
+                    android:id="@+id/signal_group_spinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </android.support.constraint.ConstraintLayout>
+        </LinearLayout>
     </android.support.constraint.ConstraintLayout>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/signal_list_view"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="0dp"
-        android:paddingBottom="50dp"
+        android:paddingBottom="90dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/spinner_container" />
+        app:layout_constraintTop_toBottomOf="@id/spinner_container">
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/signal_list_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </android.support.v4.widget.SwipeRefreshLayout>
 
 </android.support.constraint.ConstraintLayout>

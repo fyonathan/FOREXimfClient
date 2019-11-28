@@ -3,10 +3,13 @@
     <item android:id="@+id/action_signal"
         android:title="@string/menu_signal"
         android:icon="@mipmap/ic_markets" />
-    <item android:id="@+id/action_assistant"
-        android:title="@string/menu_assistant"
-        android:icon="@mipmap/ic_assistant" />
-    <item android:id="@+id/action_chat"
-        android:title="@string/menu_chat"
-        android:icon="@mipmap/ic_chat" />
+    <item android:id="@+id/action_camarilla"
+        android:title="@string/menu_camarilla"
+        android:icon="@mipmap/ic_table" />
+    <!--<item android:id="@+id/action_assistant"-->
+        <!--android:title="@string/menu_assistant"-->
+        <!--android:icon="@mipmap/ic_assistant" />-->
+    <!--<item android:id="@+id/action_chat"-->
+        <!--android:title="@string/menu_chat"-->
+        <!--android:icon="@mipmap/ic_chat" />-->
 </menu>

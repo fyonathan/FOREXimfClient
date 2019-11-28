@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "932220569686-pr6koc1cnfnshgljqdqbd6i0nf9v0m3m.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.foreximf.client",
+            "certificate_hash": "e808c520da5ef1e0b0144f72c30d0bebc01aa46a"
+          }
+        },
+        {
           "client_id": "932220569686-godpoq8ud91bvus5s40ug3h7dkhdsvdg.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -44,6 +52,37 @@
               "client_type": 3
             }
           ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:932220569686:android:fe9fdc80fe79b638",
+        "android_client_info": {
+          "package_name": "com.foreximf.quickpro"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "932220569686-1gmefrpr9c9661t55avbq5k183edllvm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDhCkGRlBFs62Zq9cnMD579nlwL9MevO1w"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
         },
         "ads_service": {
           "status": 2
