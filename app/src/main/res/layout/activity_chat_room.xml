@@ -4,33 +4,33 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     tools:context="com.foreximf.quickpro.chat.ChatRoomActivity">
 
-    <LinearLayout
+    <include
+        layout="@layout/activity_chat_actionbar_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="match_parent" />
 
-        <RelativeLayout
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.stfalcon.chatkit.messages.MessagesList
+            android:id="@+id/messages_list"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent"
+            android:layout_marginTop="?android:attr/actionBarSize"
+            android:layout_above="@+id/message_input_chat" />
 
-            <com.stfalcon.chatkit.messages.MessagesList
-                android:id="@+id/messages_list"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_above="@+id/message_input_chat" />
+        <com.stfalcon.chatkit.messages.MessageInput
+            android:id="@+id/message_input_chat"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            app:showAttachmentButton="true"
+            app:inputHint="Insert Message..."/>
 
-            <com.stfalcon.chatkit.messages.MessageInput
-                android:id="@+id/message_input_chat"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                app:showAttachmentButton="true"
-                app:inputHint="Insert Message..."/>
-
-        </RelativeLayout>
-
-    </LinearLayout>
+    </RelativeLayout>
 
 </android.support.constraint.ConstraintLayout>

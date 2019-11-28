@@ -356,6 +356,7 @@ public class SignalFragment extends Fragment implements SignalViewHolderListener
     }
 
     private void putExtra(Intent intent, Signal item) {
+        intent.putExtra("server-id", item.getServerId());
         intent.putExtra("title", item.getTitle());
         intent.putExtra("content", item.getContent());
         intent.putExtra("last-update", item.getCreatedTime().getTime());

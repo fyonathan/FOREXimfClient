@@ -1,7 +1,9 @@
 package com.foreximf.quickpro;
 
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.design.widget.AppBarLayout;
@@ -25,6 +27,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
+import android.webkit.WebView;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.volley.Request;
@@ -34,12 +40,17 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.foreximf.quickpro.camarilla.CamarillaFragment;
 import com.foreximf.quickpro.chat.ChatFragment;
+import com.foreximf.quickpro.chat.model.ChatThread;
+import com.foreximf.quickpro.database.ForexImfAppDatabase;
 import com.foreximf.quickpro.news.News;
 import com.foreximf.quickpro.news.NewsViewModel;
 import com.foreximf.quickpro.signal.SignalFragment;
 import com.foreximf.quickpro.signal.SignalViewModel;
 import com.foreximf.quickpro.util.ArchLifecycleApp;
 import com.foreximf.quickpro.util.DateFormatter;
+import com.foreximf.quickpro.util.F;
+import com.foreximf.quickpro.util.ImageDisplayActivity;
+import com.foreximf.quickpro.util.ImageUtils;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -50,6 +61,7 @@ import org.json.JSONObject;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import q.rorbin.badgeview.Badge;
@@ -64,6 +76,8 @@ public class MainActivity extends AppCompatActivity implements SignalFragment.On
     Fragment currentFragment;
     FragmentTransaction ft;
     AppCompatActivity activity = this;
+
+    SharedPreferences loginPreferences;
 //    SlidingUpPanelLayout slidingUpPanelLayout;
 
 //    RecyclerView dailyListView;
@@ -76,21 +90,39 @@ public class MainActivity extends AppCompatActivity implements SignalFragment.On
 
     private Tracker mTracker;
 
+    private class test extends AsyncTask<String, Void, Void> {
+
+        @Override
+        protected Void doInBackground(String... strings) {
+            List<ChatThread> ct = ForexImfAppDatabase.getDatabase(MainActivity.this).chatDao().getActiveThread();
+            Log.d("ChatThread2", ""+ct.size());
+            for(int i = 0; i < ct.size(); i++) {
+                Log.d("ChatThread2", ct.get(i).toJSON().toString());
+                ForexImfAppDatabase.getDatabase(MainActivity.this).chatDao().delete(ct.get(i));
+            }
+            return null;
+        }
+
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(R.style.AppTheme);
-        SharedPreferences loginPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        loginPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 //        loginPreferences.edit().remove("login-token").apply();
         String token = loginPreferences.getString("login-token", "");
 //        Log.d("MainActivity", "Token : " + token);
         if(token.isEmpty()) {
             moveToLoginActivity();
+        } else {
+            F.checkUpdate(this);
         }
 
         ArchLifecycleApp application = (ArchLifecycleApp) getApplication();
         mTracker = application.getDefaultTracker();
 //        mTracker.setScreenName("Detail Signal" + signal.getTitle());
 //        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
+//        new test().execute();
 
         NotificationManagerCompat.from(this).cancelAll();
 
@@ -120,14 +152,6 @@ public class MainActivity extends AppCompatActivity implements SignalFragment.On
         params.setScrollFlags(0);
 
         drawer = findViewById(R.id.drawer);
-
-        NavigationView navigationView = findViewById(R.id.sidebar);
-        View headerView = navigationView.getHeaderView(0);
-        TextView headerNameText = headerView.findViewById(R.id.header_name_text);
-        headerNameText.setText(loginPreferences.getString("user-name", ""));
-        TextView headerEmailText = headerView.findViewById(R.id.header_email_text);
-        headerEmailText.setText(loginPreferences.getString("user-email", ""));
-        navigationView.setNavigationItemSelectedListener(drawerListener);
 //        drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 
 //        slidingUpPanelLayout = findViewById(R.id.sliding_layout);
@@ -228,6 +252,28 @@ public class MainActivity extends AppCompatActivity implements SignalFragment.On
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        NavigationView navigationView = findViewById(R.id.sidebar);
+        View headerView = navigationView.getHeaderView(0);
+        ImageView headerProfileIcon = headerView.findViewById(R.id.header_profile_icon);
+        ImageUtils.loadAvatarPicasso(this, loginPreferences.getString("user-avatar", ""), headerProfileIcon);
+        headerProfileIcon.setOnClickListener(view -> {
+            Intent intent1 = new Intent(activity, ImageDisplayActivity.class);
+            intent1.putExtra("image-uri", loginPreferences.getString("user-avatar", ""));
+            intent1.putExtra("title", loginPreferences.getString("user-name", ""));
+            if(Build.VERSION.SDK_INT >= 21) {
+                startActivity(intent1, ActivityOptions.makeSceneTransitionAnimation(activity).toBundle());
+            }
+        });
+        TextView headerNameText = headerView.findViewById(R.id.header_name_text);
+        headerNameText.setText(loginPreferences.getString("user-name", ""));
+        TextView headerEmailText = headerView.findViewById(R.id.header_email_text);
+        headerEmailText.setText(loginPreferences.getString("user-email", ""));
+        navigationView.setNavigationItemSelectedListener(drawerListener);
+    }
+
+    @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         toggle.syncState();
@@ -277,10 +323,26 @@ public class MainActivity extends AppCompatActivity implements SignalFragment.On
                     .build());
                 SharedPreferences loginPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                 loginPreferences.edit().remove("login-token").apply();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+                    CookieManager.getInstance().removeAllCookies(null);
+                    CookieManager.getInstance().flush();
+                } else {
+                    CookieSyncManager cookieSyncMngr=CookieSyncManager.createInstance(MainActivity.this);
+                    cookieSyncMngr.startSync();
+                    CookieManager cookieManager=CookieManager.getInstance();
+                    cookieManager.removeAllCookie();
+                    cookieManager.removeSessionCookie();
+                    cookieSyncMngr.stopSync();
+                    cookieSyncMngr.sync();
+                }
                 moveToLoginActivity();
             }
+            if (item.getItemId() == R.id.nav_profile) {
+                Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
+                startActivity(intent);
+            }
             drawer.closeDrawer(GravityCompat.START);
-            return true;
+            return false;
         }
     };
 
@@ -310,13 +372,13 @@ public class MainActivity extends AppCompatActivity implements SignalFragment.On
                     ft.commit();
                     return true;
                 }
-                case R.id.action_chat: {
-                    ft = getSupportFragmentManager().beginTransaction();
-                    currentFragment = ChatFragment.newInstance();
-                    ft.replace(R.id.fragment_container, currentFragment, "CHAT");
-                    ft.commit();
-                    return true;
-                }
+//                case R.id.action_chat: {
+//                    ft = getSupportFragmentManager().beginTransaction();
+//                    currentFragment = ChatFragment.newInstance();
+//                    ft.replace(R.id.fragment_container, currentFragment, "CHAT");
+//                    ft.commit();
+//                    return true;
+//                }
 //                case R.id.action_assistant : {
 //                    ft = getSupportFragmentManager().beginTransaction();
 //                    currentFragment = new AssistantFragment();

@@ -180,7 +180,7 @@ public class Signal {
                 return "XAG";
             }
             case 19 : {
-                return "XUL";
+                return "XAU";
             }
             default : {
                 return "CLSK";

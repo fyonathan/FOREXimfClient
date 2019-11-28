@@ -198,6 +198,7 @@ public class CamarillaFragment extends Fragment {
                                     String camarillaPairName = camarillaJson.getString("currency_pair_name");
                                     Date camarillaDate = DateFormatter.format(camarillaJson.getString("updated_at"));
                                     float pivot = (float) camarillaJson.getDouble("pivot");
+                                    float open = (float) camarillaJson.getDouble("open");
                                     float sellArea = (float) camarillaJson.getDouble("sell_area");
                                     float sellTp1 = (float) camarillaJson.getDouble("sell_tp1");
                                     float sellTp2 = (float) camarillaJson.getDouble("sell_tp2");
@@ -223,10 +224,10 @@ public class CamarillaFragment extends Fragment {
 //                                    }else{
                                     Camarilla temp = repository.getCamarillaByServerId(serverId);
                                     if(temp == null) {
-                                        Camarilla camarilla = new Camarilla(camarillaPairName, pivot, sellArea, sellTp1, sellTp2, sellSl, buyArea, buyTp1, buyTp2, buySl, buyBreakoutArea, buyBreakoutTp1, buyBreakoutTp2, buyBreakoutSl, sellBreakoutArea, sellBreakoutTp1, sellBreakoutTp2, sellBreakoutSl, camarillaDate, serverId);
+                                        Camarilla camarilla = new Camarilla(camarillaPairName, pivot, open, sellArea, sellTp1, sellTp2, sellSl, buyArea, buyTp1, buyTp2, buySl, buyBreakoutArea, buyBreakoutTp1, buyBreakoutTp2, buyBreakoutSl, sellBreakoutArea, sellBreakoutTp1, sellBreakoutTp2, sellBreakoutSl, camarillaDate, serverId);
                                         repository.addCamarilla(camarilla);
                                     }else{
-                                        Camarilla camarilla = new Camarilla(temp.id, camarillaPairName, pivot, sellArea, sellTp1, sellTp2, sellSl, buyArea, buyTp1, buyTp2, buySl, buyBreakoutArea, buyBreakoutTp1, buyBreakoutTp2, buyBreakoutSl, sellBreakoutArea, sellBreakoutTp1, sellBreakoutTp2, sellBreakoutSl, camarillaDate, serverId);
+                                        Camarilla camarilla = new Camarilla(temp.id, camarillaPairName, pivot, open, sellArea, sellTp1, sellTp2, sellSl, buyArea, buyTp1, buyTp2, buySl, buyBreakoutArea, buyBreakoutTp1, buyBreakoutTp2, buyBreakoutSl, sellBreakoutArea, sellBreakoutTp1, sellBreakoutTp2, sellBreakoutSl, camarillaDate, serverId);
                                         repository.updateCamarilla(camarilla);
                                     }
 //                                        Signal signal = new Signal(temp.getId(), signalTitle, signalContent, signalDate, signalRead, signalPair, signalOrderType, signalResult, signalStatus, signalGroup, signalId);

@@ -9,7 +9,7 @@
     android:paddingEnd="10dp"
     android:paddingRight="10dp"
     android:background="@color/colorLightBlue">
-    <ImageView
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/header_profile_icon"
         android:layout_width="72dp"
         android:layout_height="72dp"

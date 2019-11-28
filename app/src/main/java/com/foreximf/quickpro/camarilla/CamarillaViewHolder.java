@@ -11,6 +11,7 @@ public class CamarillaViewHolder extends RecyclerView.ViewHolder {
     private TextView nameText;
     private TextView dateText;
     private TextView pivotText;
+    private TextView openText;
     private TextView sellAreaText;
     private TextView sellTp1Text;
     private TextView sellTp2Text;
@@ -31,6 +32,7 @@ public class CamarillaViewHolder extends RecyclerView.ViewHolder {
     CamarillaViewHolder(View itemView) {
         super(itemView);
         pivotText = itemView.findViewById(R.id.camarilla_pivot_text);
+        openText = itemView.findViewById(R.id.camarilla_open_text);
         nameText = itemView.findViewById(R.id.camarilla_name_text);
         dateText = itemView.findViewById(R.id.camarilla_date_text);
         sellAreaText = itemView.findViewById(R.id.camarilla_sell_area_text);
@@ -56,6 +58,7 @@ public class CamarillaViewHolder extends RecyclerView.ViewHolder {
         String dateString = DateFormatter.format(_item.getLastUpdate(), "dd MMM, HH:mm");
         dateText.setText(dateString);
         pivotText.setText(new StringBuilder(": ").append(String.valueOf(_item.getPivot())));
+        openText.setText(new StringBuilder(": ").append(String.valueOf(_item.getOpen())));
         sellAreaText.setText(new StringBuilder(": ").append(String.valueOf(_item.getSellArea())));
         sellTp1Text.setText(new StringBuilder(": ").append(String.valueOf(_item.getSellTp1())));
         sellTp2Text.setText(new StringBuilder(": ").append(String.valueOf(_item.getSellTp2())));

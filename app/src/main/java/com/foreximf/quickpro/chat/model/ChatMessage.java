@@ -6,23 +6,24 @@ import android.arch.persistence.room.PrimaryKey;
 import android.arch.persistence.room.TypeConverters;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.foreximf.quickpro.util.DateConverter;
 import com.stfalcon.chatkit.commons.models.IMessage;
 import com.stfalcon.chatkit.commons.models.IUser;
 import com.stfalcon.chatkit.commons.models.MessageContentType;
 
+import org.json.JSONObject;
+
 import java.util.Date;
 
 @Entity(tableName = "chat_message")
-public class ChatMessage implements IMessage, MessageContentType.Image {
+public class ChatMessage {
 
     @PrimaryKey @NonNull
     public String id;
     private String id_chat_thread;
     private String id_chat_user;
-    @Ignore
-    private IUser user;
     private String type;
     private String message;
     private int is_read;
@@ -31,30 +32,33 @@ public class ChatMessage implements IMessage, MessageContentType.Image {
     @TypeConverters(DateConverter.class)
     private Date time;
 
+    public ChatMessage() { }
+
+    public ChatMessage(JSONObject obj) {
+        try {
+            this.id = obj.getString("id");
+            this.id_chat_thread = obj.optString("thread");
+            this.id_chat_user = obj.optString("user");
+            this.type = obj.optString("type");
+            this.message = obj.optString("message");
+            this.is_read = obj.optInt("is_read");
+            if (this.is_read == 1) {
+                this.is_read = 2;
+            }
+            this.sent_count = obj.optInt("sent_count");
+            this.read_count = obj.optInt("read_count");
+            this.time = new Date(obj.optLong("utime"));
+        } catch (Exception ex) {
+
+        }
+    }
+
+    @NonNull
     public String getId() {
         return id;
     }
 
-    @Override
-    public String getText() {
-        return message;
-    }
-
-    @Override
-    public IUser getUser() {
-        return user;
-    }
-
-    public void setUser(IUser user) {
-        this.user = user;
-    }
-
-    @Override
-    public Date getCreatedAt() {
-        return time;
-    }
-
-    public void setId(String id) {
+    public void setId(@NonNull String id) {
         this.id = id;
     }
 
@@ -84,6 +88,26 @@ public class ChatMessage implements IMessage, MessageContentType.Image {
 
     public String getMessage() {
         return message;
+    }
+
+    public String getLabelMessage() {
+        if (type.equals("Image") || type.equals("Temporary:Image")) {
+            try {
+                JSONObject obj = new JSONObject(message);
+                return obj.getString("label");
+            } catch (Exception ex) {}
+        }
+        return message;
+    }
+
+    public String getImage() {
+        if (type.equals("Image") || type.equals("Temporary:Image")) {
+            try {
+                JSONObject obj = new JSONObject(message);
+                return obj.getString("image");
+            } catch (Exception ex) {}
+        }
+        return null;
     }
 
     public void setMessage(String message) {
@@ -120,11 +144,5 @@ public class ChatMessage implements IMessage, MessageContentType.Image {
 
     public void setTime(Date time) {
         this.time = time;
-    }
-
-    @Nullable
-    @Override
-    public String getImageUrl() {
-        return null;
     }
 }

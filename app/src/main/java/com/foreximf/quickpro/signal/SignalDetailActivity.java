@@ -3,7 +3,9 @@ package com.foreximf.quickpro.signal;
 import android.app.Activity;
 import android.app.ActivityOptions;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.support.design.widget.AppBarLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -11,17 +13,28 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.Spannable;
 import android.text.method.LinkMovementMethod;
+import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.VolleyError;
+import com.foreximf.quickpro.LoginActivity;
+import com.foreximf.quickpro.MainActivity;
 import com.foreximf.quickpro.R;
 import com.foreximf.quickpro.util.ArchLifecycleApp;
 import com.foreximf.quickpro.util.DateFormatter;
+import com.foreximf.quickpro.util.F;
 import com.foreximf.quickpro.util.ImageDisplayActivity;
 import com.foreximf.quickpro.util.ImageUtils;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A simple class used to display the detail of
@@ -49,6 +62,21 @@ public class SignalDetailActivity extends AppCompatActivity {
         mTracker = application.getDefaultTracker();
         mTracker.setScreenName("Detail Signal" + signal.getTitle());
         mTracker.send(new HitBuilders.ScreenViewBuilder().build());
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String url = "https://client.foreximf.com/api-track";
+        Map<String, String> jparams = new HashMap<>();
+        jparams.put("signal", ""+signal.getServerId());
+        jparams.put("token", preferences.getString("login-token", ""));
+        F.JSONRequest(this, url, jparams, new F.JSONRequestCallback() {
+            @Override
+            public void onSuccess(JSONObject response) {
+            }
+
+            @Override
+            public void onError(VolleyError error) {
+            }
+        });
 
         TextView title = findViewById(R.id.signal_detail_date);
         String dateString = DateFormatter.format(signal.getCreatedTime(), "dd/MM/yyyy HH:mm") + " WIB";
@@ -98,6 +126,7 @@ public class SignalDetailActivity extends AppCompatActivity {
 
     private Signal getExtra(Intent intent) {
         Signal item = new Signal();
+        item.setServerId(intent.getIntExtra("server-id", 0));
         item.setTitle(intent.getStringExtra("title"));
         item.setContent(intent.getStringExtra("content"));
         Date date = new Date();

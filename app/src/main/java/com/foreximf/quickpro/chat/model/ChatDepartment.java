@@ -4,17 +4,10 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
-import com.stfalcon.chatkit.commons.models.IDialog;
-import com.stfalcon.chatkit.commons.models.IMessage;
-import com.stfalcon.chatkit.commons.models.IUser;
-
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Entity(tableName = "chat_department")
-public class ChatDepartment implements IDialog {
+public class ChatDepartment {
 
     @PrimaryKey @NonNull
     public String id;
@@ -29,9 +22,9 @@ public class ChatDepartment implements IDialog {
     public ChatDepartment(JSONObject obj) {
         try {
             this.id = obj.getString("id");
-            this.name = obj.getString("name");
-            this.avatar = obj.getString("avatar");
-            this.description = obj.getString("description");
+            this.name = obj.optString("name");
+            this.avatar = obj.optString("avatar");
+            this.description = obj.optString("description");
         } catch (Exception ex) {
 
         }
@@ -39,36 +32,6 @@ public class ChatDepartment implements IDialog {
 
     public String getId() {
         return id;
-    }
-
-    @Override
-    public String getDialogPhoto() {
-        return this.avatar;
-    }
-
-    @Override
-    public String getDialogName() {
-        return this.name;
-    }
-
-    @Override
-    public List<? extends IUser> getUsers() {
-        return new ArrayList<>();
-    }
-
-    @Override
-    public IMessage getLastMessage() {
-        return null;
-    }
-
-    @Override
-    public void setLastMessage(IMessage message) {
-
-    }
-
-    @Override
-    public int getUnreadCount() {
-        return 0;
     }
 
     public void setId(String id) {

@@ -1,5 +1,6 @@
 package com.foreximf.quickpro.util;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -11,6 +12,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.foreximf.quickpro.R;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -24,6 +31,7 @@ public class ImageUtils {
     also has a custom ImageGetter based on Picasso for loading <img> tags inside the html.
     We use this for rendering formulas in challenges
      */
+    private static boolean picasso_log = false;
 
     public static Spannable getSpannableHtmlWithImageGetter(TextView view, String value) {
         PicassoImageGetter imageGetter = new PicassoImageGetter(view.getContext(), view);
@@ -54,6 +62,67 @@ public class ImageUtils {
                     callback.onImageClick(span.getSource());
                 }
             }, start, end, flags);
+        }
+    }
+
+    private  static final String domain = "https://chat2.foreximf.com";
+
+    public static void loadImagePicasso(Context context, String uri, ImageView imageView) {
+        if (uri == null || uri.isEmpty()) {
+//            Picasso.with(context)
+//                    .load(error)
+//                    .into(imageView);
+        } else {
+            final String url = uri.charAt(0) == '/' ? domain + uri : uri;
+            Picasso.with(context).setLoggingEnabled(picasso_log);
+            Picasso.with(context)
+                .load(url)
+                .networkPolicy(NetworkPolicy.OFFLINE, NetworkPolicy.NO_CACHE)
+                .into(imageView, new com.squareup.picasso.Callback() {
+                    @Override
+                    public void onSuccess() {
+
+                    }
+
+                    @Override
+                    public void onError() {
+                        Picasso.with(context)
+                                .load(url)
+//                                .placeholder()
+//                                .error()
+                                .into(imageView);
+                    }
+                });
+        }
+    }
+
+    public static void loadAvatarPicasso(Context context, String uri, ImageView imageView) {
+        if (uri == null || uri.isEmpty()) {
+            Picasso.with(context).setLoggingEnabled(picasso_log);
+            Picasso.with(context)
+                .load(R.mipmap.ic_user)
+                .into(imageView);
+        } else {
+            final String url = uri.charAt(0) == '/' ? domain + uri : uri;
+            Picasso.with(context).setLoggingEnabled(picasso_log);
+            Picasso.with(context)
+                .load(url)
+                .networkPolicy(NetworkPolicy.OFFLINE, NetworkPolicy.NO_CACHE)
+                .into(imageView, new com.squareup.picasso.Callback() {
+                    @Override
+                    public void onSuccess() {
+
+                    }
+
+                    @Override
+                    public void onError() {
+                        Picasso.with(context)
+                            .load(url)
+                            .placeholder(R.mipmap.ic_user)
+                            .error(R.mipmap.ic_user)
+                            .into(imageView);
+                    }
+                });
         }
     }
 

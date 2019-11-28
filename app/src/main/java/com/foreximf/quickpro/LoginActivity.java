@@ -6,13 +6,9 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
+import android.graphics.PointF;
 import android.graphics.Rect;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.app.LoaderManager.LoaderCallbacks;
 
@@ -35,17 +31,28 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
+import com.android.volley.VolleyError;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
+import com.foreximf.quickpro.util.F;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.Task;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -80,11 +87,80 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private View mProgressView;
     private View mLoginFormView;
 
+    // Google Sign In
+    private GoogleSignInOptions gso;
+    private GoogleSignInClient mGoogleSignInClient;
+    private static final int RC_SIGN_IN = 112;
+
+    //Facebook Sign In
+    private CallbackManager callbackManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setTheme(R.style.AppTheme);
         setContentView(R.layout.activity_login);
+
+        Intent i = getIntent();
+        if (i.hasExtra("message")) {
+            Toast.makeText(this, i.getStringExtra("message"), Toast.LENGTH_LONG).show();
+        }
+
+        gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.google_auth))
+                .requestEmail()
+                .build();
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        Button gmail = findViewById(R.id.gmail_login);
+        gmail.setOnClickListener(view -> {
+            if (account != null) {
+                mGoogleSignInClient.signOut().addOnCompleteListener(LoginActivity.this, task -> {
+                    Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+                    startActivityForResult(signInIntent, RC_SIGN_IN);
+                });
+            } else {
+                Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+                startActivityForResult(signInIntent, RC_SIGN_IN);
+            }
+        });
+
+        callbackManager = CallbackManager.Factory.create();
+        LoginManager.getInstance().registerCallback(
+            callbackManager,
+            new FacebookCallback<LoginResult>() {
+                @Override
+                public void onSuccess(LoginResult loginResult) {
+                    // Handle success
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if(F.isNetworkAvailable(LoginActivity.this)) {
+                                facebookSignIn(loginResult.getAccessToken().getToken());
+                            } else {
+                                Toast.makeText(LoginActivity.this, "Anda tidak terhubung dengan internet, silahkan periksa kembali koneksi anda.", Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    });
+                }
+
+                @Override
+                public void onCancel() {
+                }
+
+                @Override
+                public void onError(FacebookException exception) {
+                }
+            }
+        );
+        Button facebook = findViewById(R.id.facebook_login);
+        facebook.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                LoginManager.getInstance().logInWithReadPermissions(LoginActivity.this, Arrays.asList("email", "public_profile"));
+            }
+        });
+
         // Set up the login form.
         mEmailView = findViewById(R.id.email);
 //        mEmailView.setOnFocusChangeListener(focusChangeListener);
@@ -102,7 +178,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         Button mEmailSignInButton = findViewById(R.id.email_sign_in_button);
         mEmailSignInButton.setOnClickListener((View view) -> {
-            if(isNetworkAvailable()) {
+            if(F.isNetworkAvailable(LoginActivity.this)) {
                 attemptLogin();
             } else {
                 Toast.makeText(this, "Anda tidak terhubung dengan internet, silahkan periksa kembali koneksi anda.", Toast.LENGTH_LONG).show();
@@ -111,23 +187,101 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+
+        TextView signup = findViewById(R.id.sign_up);
+        signup.setOnClickListener(view -> {
+            Intent signupIntent = new Intent(this, SignupActivity.class);
+            startActivity(signupIntent);
+        });
+        TextView forgot = findViewById(R.id.forgot);
+        forgot.setOnClickListener(view -> {
+            Intent forgotIntent = new Intent(this, ForgotActivity.class);
+            forgotIntent.putExtra("mode", "forgot");
+            startActivity(forgotIntent);
+        });
     }
+
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+//        switch (requestCode) {
+//            case SMS_PERMISSION_CODE: {
+//                // If request is cancelled, the result arrays are empty.
+//                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//
+//                    // permission was granted, yay! Do the
+//                    // SMS related task you need to do.
+//
+//                } else {
+//                    // permission denied, boo! Disable the
+//                    // functionality that depends on this permission.
+//                }
+//                return;
+//            }
+//            // other 'case' lines to check for other
+//            // permissions this app might request
+//        }
+//    }
+
+    private PointF _swipeCoor;
+    private Long _swipeTime;
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         if (ev.getAction() == MotionEvent.ACTION_DOWN) {
+            _swipeCoor = new PointF(ev.getRawX(), ev.getRawY());
+            _swipeTime = System.currentTimeMillis();
+        } else if (ev.getAction() == MotionEvent.ACTION_UP) {
             View v = getCurrentFocus();
-            if ( v instanceof EditText) {
-                Rect outRect = new Rect();
-                v.getGlobalVisibleRect(outRect);
-                if (!outRect.contains((int)ev.getRawX(), (int)ev.getRawY())) {
-//                    v.clearFocus();
-                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
-                }
+            if (v != null && v instanceof EditText && System.currentTimeMillis() < _swipeTime + 350 && Math.abs(ev.getRawY() - _swipeCoor.y) > 250) {
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
             }
         }
         return super.dispatchTouchEvent(ev);
+    }
+
+//    @Override
+//    public boolean dispatchTouchEvent(MotionEvent ev) {
+//        if (ev.getAction() == MotionEvent.ACTION_DOWN) {
+//            View v = getCurrentFocus();
+//            if ( v instanceof EditText) {
+//                Rect outRect = new Rect();
+//                v.getGlobalVisibleRect(outRect);
+//                if (!outRect.contains((int)ev.getRawX(), (int)ev.getRawY())) {
+//                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+//                    imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+//                }
+//            }
+//        }
+//        return super.dispatchTouchEvent(ev);
+//    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        callbackManager.onActivityResult(requestCode, resultCode, data);
+        // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
+        if (requestCode == RC_SIGN_IN) {
+            // The Task returned from this call is always completed, no need to attach
+            // a listener.
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            handleSignInResult(task);
+        }
+    }
+
+    private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
+        try {
+            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
+            if(F.isNetworkAvailable(LoginActivity.this)) {
+                googleSignIn(account.getIdToken());
+            } else {
+                Toast.makeText(LoginActivity.this, "Anda tidak terhubung dengan internet, silahkan periksa kembali koneksi anda.", Toast.LENGTH_LONG).show();
+            }
+        } catch (ApiException e) {
+            // The ApiException status code indicates the detailed failure reason.
+            // Please refer to the GoogleSignInStatusCodes class reference for more information.
+            Log.w("Gmail Sign In Error", "signInResult:failed code=" + e.getStatusCode());
+        }
     }
 
 //    private void populateAutoComplete() {
@@ -184,6 +338,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             return;
         }
 
+        // Close Keyboard
+        View v = getCurrentFocus();
+        if (v == null) {
+            v = new View(this);
+        }
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
         // Reset errors.
         mEmailView.setError(null);
         mPasswordView.setError(null);
@@ -225,18 +386,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
-            showProgress(true);
             login(email, password);
 //            mAuthTask = new UserLoginTask(email, password);
 //            mAuthTask.execute((Void) null);
         }
-    }
-
-    private boolean isNetworkAvailable() {
-        ConnectivityManager connectivityManager
-                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
     private boolean isEmailValid(String email) {
@@ -340,42 +493,122 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
     private void login(String email, String password) {
+        showProgress(true);
         String url = "https://client.foreximf.com/api-login";
-        RequestQueue queue = Volley.newRequestQueue(this);
-
         Map<String, String>  params = new HashMap<>();
         params.put("email", email);
         params.put("password", password);
-        JSONObject parameters = new JSONObject(params);
+        F.JSONRequest(this, url, params, new F.JSONRequestCallback() {
+            @Override
+            public void onSuccess(JSONObject response) {
+                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
+                try {
+                    boolean error = response.getBoolean("error");
+                    if(error) {
+                        Toast.makeText(LoginActivity.this, "Username/password salah", Toast.LENGTH_LONG).show();
+                    } else {
+                        F.setLoginPreferences(preferences, response);
+                        Intent loginIntent = new Intent(LoginActivity.this, MainActivity.class);
+                        startActivity(loginIntent);
+                        finish();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                showProgress(false);
+            }
 
-        JsonObjectRequest postRequest = new JsonObjectRequest(Request.Method.POST, url, parameters,
-                response -> {
-                    // response
-                    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-                    try {
-//                        Log.d("LoginActivity", "Error : " +response.getBoolean("error")+ " , Name : " +response.getString("name"));
-                        boolean error = response.getBoolean("error");
-                        if(error)
-                            Toast.makeText(this, "Username/password salah", Toast.LENGTH_LONG).show();
-                        else {
-                            preferences.edit().putString("user-name", response.getString("name")).apply();
-                            preferences.edit().putString("user-email", response.getString("email")).apply();
-                            preferences.edit().putString("login-token", response.getString("token")).apply();
-                            Intent loginIntent = new Intent(this, MainActivity.class);
+            @Override
+            public void onError(VolleyError error) {
+                Toast.makeText(LoginActivity.this, "Muncul error saat mencoba sign in, silakan coba beberapa saat lagi", Toast.LENGTH_LONG).show();
+                showProgress(false);
+            }
+        });
+    }
+
+    private void googleSignIn(String token) {
+        showProgress(true);
+        String url = "https://client.foreximf.com/api-login-google";
+        Map<String, String>  params = new HashMap<>();
+        params.put("token", token);
+        Log.d("Google", token);
+        F.JSONRequest(this, url, params, new F.JSONRequestCallback() {
+            @Override
+            public void onSuccess(JSONObject response) {
+                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
+                try {
+                    boolean error = response.getBoolean("error");
+                    if (error) {
+                        Toast.makeText(LoginActivity.this, "Ada kesalahan pada saat sign in google account anda", Toast.LENGTH_LONG).show();
+                    } else {
+                        boolean verified = response.getBoolean("verified");
+                        if (verified) {
+                            F.setLoginPreferences(preferences, response);
+                            Intent loginIntent = new Intent(LoginActivity.this, MainActivity.class);
                             startActivity(loginIntent);
                             finish();
+                        } else {
+                            Intent signupIntent = new Intent(LoginActivity.this, SignupActivity.class);
+                            signupIntent.putExtra("name", response.getString("name"));
+                            signupIntent.putExtra("email", response.getString("email"));
+                            signupIntent.putExtra("via", "google");
+                            startActivity(signupIntent);
                         }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
                     }
-                    showProgress(false);
-                },
-                error -> {
-                    // error
-                    Log.d("Error.Response", "" + error.getMessage());
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-        );
-        queue.add(postRequest);
+                showProgress(false);
+            }
+
+            @Override
+            public void onError(VolleyError error) {
+                Toast.makeText(LoginActivity.this, "Muncul error saat mencoba sign in, silakan coba beberapa saat lagi", Toast.LENGTH_LONG).show();
+                showProgress(false);
+            }
+        });
+    }
+
+    private void facebookSignIn(String token) {
+        showProgress(true);
+        String url = "https://client.foreximf.com/api-login-facebook";
+        Map<String, String>  params = new HashMap<>();
+        params.put("token", token);
+        F.JSONRequest(this, url, params, new F.JSONRequestCallback() {
+            @Override
+            public void onSuccess(JSONObject response) {
+                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
+                try {
+                    boolean error = response.getBoolean("error");
+                    if (error) {
+                        Toast.makeText(LoginActivity.this, "Ada kesalahan pada saat sign in facebook account anda", Toast.LENGTH_LONG).show();
+                    } else {
+                        boolean verified = response.getBoolean("verified");
+                        if (verified) {
+                            F.setLoginPreferences(preferences, response);
+                            Intent loginIntent = new Intent(LoginActivity.this, MainActivity.class);
+                            startActivity(loginIntent);
+                            finish();
+                        } else {
+                            Intent signupIntent = new Intent(LoginActivity.this, SignupActivity.class);
+                            signupIntent.putExtra("name", response.getString("name"));
+                            signupIntent.putExtra("email", response.getString("email"));
+                            signupIntent.putExtra("via", "facebook");
+                            startActivity(signupIntent);
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                showProgress(false);
+            }
+
+            @Override
+            public void onError(VolleyError error) {
+                Toast.makeText(LoginActivity.this, "Muncul error saat mencoba sign in, silakan coba beberapa saat lagi", Toast.LENGTH_LONG).show();
+                showProgress(false);
+            }
+        });
     }
 
     /**
@@ -435,4 +668,3 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
     }
 }
-

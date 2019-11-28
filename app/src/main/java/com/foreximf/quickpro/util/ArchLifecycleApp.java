@@ -12,6 +12,8 @@ import com.foreximf.quickpro.R;
 import com.foreximf.quickpro.services.WebSocketChat;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
+import com.squareup.picasso.OkHttpDownloader;
+import com.squareup.picasso.Picasso;
 import com.vanniktech.emoji.EmojiManager;
 import com.vanniktech.emoji.ios.IosEmojiProvider;
 
@@ -21,6 +23,7 @@ public class ArchLifecycleApp extends Application implements LifecycleObserver {
     private static GoogleAnalytics sAnalytics;
     private static Tracker sTracker;
 
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -28,6 +31,19 @@ public class ArchLifecycleApp extends Application implements LifecycleObserver {
         EmojiManager.install(new IosEmojiProvider());
 
         sAnalytics = GoogleAnalytics.getInstance(this);
+
+        Picasso.Builder builder = new Picasso.Builder(this);
+        builder.downloader(new OkHttpDownloader(this,Integer.MAX_VALUE));
+        Picasso built = builder.build();
+        built.setIndicatorsEnabled(true);
+        built.setLoggingEnabled(true);
+        Picasso.setSingletonInstance(built);
+    }
+
+    @Override
+    public void onTerminate() {
+//        unregisterReceiver(smsListener);
+        super.onTerminate();
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)

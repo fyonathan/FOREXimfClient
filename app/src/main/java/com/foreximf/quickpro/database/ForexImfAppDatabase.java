@@ -11,14 +11,11 @@ import android.support.annotation.NonNull;
 
 import com.foreximf.quickpro.camarilla.Camarilla;
 import com.foreximf.quickpro.camarilla.CamarillaDao;
+import com.foreximf.quickpro.chat.ChatDao;
 import com.foreximf.quickpro.chat.model.ChatDepartment;
-import com.foreximf.quickpro.chat.model.ChatDepartmentDao;
 import com.foreximf.quickpro.chat.model.ChatMessage;
-import com.foreximf.quickpro.chat.model.ChatMessageDao;
 import com.foreximf.quickpro.chat.model.ChatThread;
-import com.foreximf.quickpro.chat.model.ChatThreadDao;
 import com.foreximf.quickpro.chat.model.ChatUser;
-import com.foreximf.quickpro.chat.model.ChatUserDao;
 import com.foreximf.quickpro.news.News;
 import com.foreximf.quickpro.news.NewsDao;
 import com.foreximf.quickpro.signal.Signal;
@@ -66,10 +63,12 @@ public abstract class ForexImfAppDatabase extends RoomDatabase {
     static final Migration MIGRATION_3_4 = new Migration(3, 4) {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE camarilla "
+                    + " ADD COLUMN open REAL NOT NULL DEFAULT 0");
             database.execSQL("CREATE TABLE IF NOT EXISTS `chat_department` (`id` TEXT NOT NULL, `name` TEXT, `avatar` TEXT, `description` TEXT, PRIMARY KEY(`id`))");
             database.execSQL("CREATE TABLE IF NOT EXISTS `chat_message` (`id` TEXT NOT NULL, `id_chat_thread` TEXT, `id_chat_user` TEXT, `type` TEXT, `message` TEXT, `is_read` INTEGER NOT NULL, `sent_count` INTEGER NOT NULL, `read_count` INTEGER NOT NULL, `time` INTEGER, PRIMARY KEY(`id`))");
-            database.execSQL("CREATE TABLE IF NOT EXISTS `chat_thread` (`id` TEXT NOT NULL, `type` TEXT, `name` TEXT, `status` INTEGER NOT NULL, `created_at` INTEGER, `updated_at` INTEGER, PRIMARY KEY(`id`))");
-            database.execSQL("CREATE TABLE IF NOT EXISTS `chat_user` (`id` TEXT NOT NULL, `nama` TEXT, `avatar` TEXT, `status` INTEGER NOT NULL, `last_online` INTEGER, PRIMARY KEY(`id`))");
+            database.execSQL("CREATE TABLE IF NOT EXISTS `chat_thread` (`id` TEXT NOT NULL, `id_chat_department` TEXT, `id_last_message` TEXT, `type` TEXT, `name` TEXT, `avatar` TEXT, `status` INTEGER NOT NULL, `unread` INTEGER NOT NULL, `updated_at` INTEGER, PRIMARY KEY(`id`))");
+            database.execSQL("CREATE TABLE IF NOT EXISTS `chat_user` (`id` TEXT NOT NULL, `name` TEXT, `avatar` TEXT, `status` TEXT, `last_online` INTEGER, PRIMARY KEY(`id`))");
         }
     };
 
@@ -77,8 +76,5 @@ public abstract class ForexImfAppDatabase extends RoomDatabase {
     public abstract SignalDao signalModel();
     public abstract CamarillaDao camarillaModel();
 
-    public abstract ChatDepartmentDao chatDepartmentDao();
-    public abstract ChatMessageDao chatMessageDao();
-    public abstract ChatThreadDao chatThreadDao();
-    public abstract ChatUserDao chatUserDao();
+    public abstract ChatDao chatDao();
 }

@@ -26,7 +26,7 @@
         <item>USDCHF</item>
         <item>USDJPY</item>
         <item>XAG</item>
-        <item>XUL</item>
+        <item>XAU</item>
         <item>CLSK</item>
     </string-array>
     <string-array name="spinner_group_list_item_array">

@@ -16,6 +16,7 @@ public class Camarilla {
     public int id;
     private String pairName;
     private float pivot;
+    private float open;
     private float sellArea;
     private float sellTp1;
     private float sellTp2;
@@ -36,9 +37,10 @@ public class Camarilla {
     private Date lastUpdate;
     private int serverId;
 
-    public Camarilla(String pairName, float pivot, float sellArea, float sellTp1, float sellTp2, float sellSl, float buyArea, float buyTp1, float buyTp2, float buySl, float buyBreakoutArea, float buyBreakoutTp1, float buyBreakoutTp2, float buyBreakoutSl, float sellBreakoutArea, float sellBreakoutTp1, float sellBreakoutTp2, float sellBreakoutSl, Date lastUpdate, int serverId) {
+    public Camarilla(String pairName, float pivot, float open, float sellArea, float sellTp1, float sellTp2, float sellSl, float buyArea, float buyTp1, float buyTp2, float buySl, float buyBreakoutArea, float buyBreakoutTp1, float buyBreakoutTp2, float buyBreakoutSl, float sellBreakoutArea, float sellBreakoutTp1, float sellBreakoutTp2, float sellBreakoutSl, Date lastUpdate, int serverId) {
         this.pairName = pairName;
         this.pivot = pivot;
+        this.open = open;
         this.sellArea = sellArea;
         this.sellTp1 = sellTp1;
         this.sellTp2 = sellTp2;
@@ -60,10 +62,11 @@ public class Camarilla {
     }
 
     @Ignore
-    public Camarilla(int id, String pairName, float pivot, float sellArea, float sellTp1, float sellTp2, float sellSl, float buyArea, float buyTp1, float buyTp2, float buySl, float buyBreakoutArea, float buyBreakoutTp1, float buyBreakoutTp2, float buyBreakoutSl, float sellBreakoutArea, float sellBreakoutTp1, float sellBreakoutTp2, float sellBreakoutSl, Date lastUpdate, int serverId) {
+    public Camarilla(int id, String pairName, float pivot, float open, float sellArea, float sellTp1, float sellTp2, float sellSl, float buyArea, float buyTp1, float buyTp2, float buySl, float buyBreakoutArea, float buyBreakoutTp1, float buyBreakoutTp2, float buyBreakoutSl, float sellBreakoutArea, float sellBreakoutTp1, float sellBreakoutTp2, float sellBreakoutSl, Date lastUpdate, int serverId) {
         this.id = id;
         this.pairName = pairName;
         this.pivot = pivot;
+        this.open = open;
         this.sellArea = sellArea;
         this.sellTp1 = sellTp1;
         this.sellTp2 = sellTp2;
@@ -98,6 +101,14 @@ public class Camarilla {
 
     public void setPivot(float pivot) {
         this.pivot = pivot;
+    }
+
+    public float getOpen() {
+        return open;
+    }
+
+    public void setOpen(float open) {
+        this.pivot = open;
     }
 
     public float getSellArea() {
