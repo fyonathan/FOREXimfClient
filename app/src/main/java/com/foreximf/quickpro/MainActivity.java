@@ -112,6 +112,7 @@ public class MainActivity extends AppCompatActivity implements SignalFragment.On
 //        loginPreferences.edit().remove("login-token").apply();
         String token = loginPreferences.getString("login-token", "");
 //        Log.d("MainActivity", "Token : " + token);
+        
         if(token.isEmpty()) {
             moveToLoginActivity();
         } else {
